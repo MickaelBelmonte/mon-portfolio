@@ -119,6 +119,7 @@ body {
     z-index: -1;
     background: var(--bg);
     display: block;
+    pointer-events: none;
 }
 
 /* ------------------------------
