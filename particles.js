@@ -5,38 +5,63 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let particlesArray = [];
+const mouse = {
+    x: null,
+    y: null,
+    radius: 120 // zone d’attraction
+};
+
+window.addEventListener("mousemove", (event) => {
+    mouse.x = event.x;
+    mouse.y = event.y;
+});
 
 class Particle {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
         this.size = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
-    }
-
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        this.baseX = this.x;
+        this.baseY = this.y;
+        this.speed = Math.random() * 1 + 0.2;
     }
 
     draw() {
-        ctx.fillStyle = "rgba(76, 201, 240, 0.8)";
+        ctx.fillStyle = "rgba(76, 201, 240, 0.9)";
         ctx.shadowColor = "rgba(76, 201, 240, 1)";
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 12;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.closePath();
         ctx.fill();
     }
+
+    update() {
+        let dx = mouse.x - this.x;
+        let dy = mouse.y - this.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < mouse.radius) {
+            // Attraction vers la souris
+            this.x += dx / 20;
+            this.y += dy / 20;
+        } else {
+            // Retour à la position initiale
+            if (this.x !== this.baseX) {
+                let dxBack = this.x - this.baseX;
+                this.x -= dxBack / 40;
+            }
+            if (this.y !== this.baseY) {
+                let dyBack = this.y - this.baseY;
+                this.y -= dyBack / 40;
+            }
+        }
+    }
 }
 
 function initParticles() {
     particlesArray = [];
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 150; i++) {
         particlesArray.push(new Particle());
     }
 }
