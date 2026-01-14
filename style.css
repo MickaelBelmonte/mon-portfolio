@@ -160,6 +160,47 @@ footer {
 }
 
 /* ------------------------------
+    TIMELINE
+--------------------------------*/
+
+.timeline {
+    margin: 40px auto;
+    border-left: 2px solid var(--accent);
+    padding-left: 30px;
+    max-width: 700px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.timeline-dot {
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: absolute;
+    left: -38px;
+    top: 5px;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.timeline-content {
+    background: var(--card);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 10px rgba(76, 201, 240, 0.2);
+}
+
+.timeline-content h3 {
+    margin-bottom: 5px;
+    color: var(--accent);
+}
+
+
+/* ------------------------------
    NEON GLOW
 --------------------------------*/
 
