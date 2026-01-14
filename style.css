@@ -24,8 +24,8 @@
 
 body {
     font-family: "Inter", Arial, sans-serif;
-    background: #0d0d0d;
-    color: #e6e6e6;
+    background: var(--bg);
+    color: var(--text);
     line-height: 1.6;
 }
 
@@ -38,7 +38,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 18px 40px;
-    background: rgba(20, 20, 20, 0.9);
+    background: var(--bg);
     backdrop-filter: blur(6px);
     border-bottom: 1px solid #1f1f1f;
 }
@@ -46,7 +46,7 @@ body {
 .logo {
     font-size: 1.4rem;
     font-weight: 600;
-    color: #4cc9f0;
+    color: var(--text);
 }
 
 .nav-links {
@@ -56,14 +56,14 @@ body {
 }
 
 .nav-links a {
-    color: #e6e6e6;
+    color: var(--text);
     text-decoration: none;
     font-size: 0.95rem;
     transition: 0.2s;
 }
 
 .nav-links a:hover {
-    color: #4cc9f0;
+    color: var(--text);
 }
 
 /* ------------------------------
@@ -80,7 +80,7 @@ body {
 .hero h2 {
     font-size: 2.5rem;
     margin-bottom: 15px;
-    color: #4cc9f0;
+    color: var(--text);
 }
 
 .hero p {
@@ -94,8 +94,8 @@ body {
     display: inline-block;
     margin-top: 25px;
     padding: 12px 28px;
-    background: #4cc9f0;
-    color: #0d0d0d;
+    background: var(--bg); 
+    color: var(--text);
     border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
@@ -103,7 +103,7 @@ body {
 }
 
 .btn:hover {
-    background: #3bb3d8;
+    background: var(--bg);
 }
 
 /* ------------------------------
@@ -118,7 +118,7 @@ main {
 
 h2 {
     margin-bottom: 15px;
-    color: #4cc9f0;
+    color: var(--text);
 }
 
 p, li {
@@ -153,8 +153,8 @@ p, li {
 footer {
     text-align: center;
     padding: 20px;
-    background: #111;
-    color: #777;
+    background: var(--bg); 
+    color: var(--text);
     margin-top: 40px;
     border-top: 1px solid #1f1f1f;
 }
