@@ -63,7 +63,7 @@ body {
 }
 
 .nav-links a:hover {
-    color: var(--text);
+    color: var(--accent);
 }
 
 /* ------------------------------
@@ -94,16 +94,17 @@ body {
     display: inline-block;
     margin-top: 25px;
     padding: 12px 28px;
-    background: var(--bg); 
+    background: var(--bg);
     color: var(--text);
     border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
-    transition: 0.2s;
+    transition: 0.25s ease;
+    box-shadow: 0 0 10px var(--accent);
 }
 
 .btn:hover {
-    background: var(--bg);
+    box-shadow: 0 0 20px var(--accent);
 }
 
 /* ------------------------------
@@ -118,7 +119,6 @@ body {
     height: 100%;
     z-index: -1;
     background: var(--bg);
-    display: block;
     pointer-events: none;
 }
 
@@ -152,7 +152,7 @@ p, li {
     object-fit: cover;
     margin: 20px auto;
     display: block;
-    border: 3px solid #4cc9f0;
+    border: 3px solid var(--accent);
 }
 
 .project-img {
@@ -160,6 +160,7 @@ p, li {
     border-radius: 10px;
     margin: 20px 0;
     border: 1px solid #1f1f1f;
+    transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 /* ------------------------------
@@ -169,7 +170,7 @@ p, li {
 footer {
     text-align: center;
     padding: 20px;
-    background: var(--bg); 
+    background: var(--bg);
     color: var(--text);
     margin-top: 40px;
     border-top: 1px solid #1f1f1f;
@@ -215,7 +216,6 @@ footer {
     color: var(--accent);
 }
 
-
 /* ------------------------------
    NEON GLOW
 --------------------------------*/
@@ -227,17 +227,10 @@ footer {
                  0 0 20px var(--accent);
 }
 
-.btn {
-    box-shadow: 0 0 10px var(--accent);
-}
-
-.btn:hover {
-    box-shadow: 0 0 20px var(--accent);
-}
-
 /* ------------------------------
    PAGE PROJECTS
 --------------------------------*/
+
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -251,12 +244,12 @@ footer {
     border-radius: 10px;
     border: 1px solid var(--accent);
     box-shadow: 0 0 10px rgba(76, 201, 240, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 20px rgba(76, 201, 240, 0.4);
+    transform: translateY(-6px);
+    box-shadow: 0 0 25px rgba(76, 201, 240, 0.35);
 }
 
 .project-card h3 {
@@ -278,33 +271,37 @@ footer {
 .project-tags span {
     background: var(--accent);
     color: #000;
-    padding: 4px 10px;
-    border-radius: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
     font-size: 0.75rem;
     font-weight: bold;
-}
-
-.project-img {
-    transition: transform 0.3s ease, filter 0.3s ease;
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.4);
 }
 
 .project-card:hover .project-img {
     transform: scale(1.05);
     filter: brightness(1.2);
+    box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
 }
+
+/* ------------------------------
+   ANIMATIONS
+--------------------------------*/
 
 .fade-in {
     opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.6s ease forwards;
+    transform: translateY(25px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.appear {
+    opacity: 1;
+    transform: translateY(0);
 }
+
+/* ------------------------------
+   FILTERS
+--------------------------------*/
 
 .project-filters {
     display: flex;
@@ -315,17 +312,20 @@ footer {
 .filter-btn {
     background: var(--card);
     border: 1px solid var(--accent);
-    padding: 8px 16px;
+    padding: 8px 18px;
     border-radius: 6px;
     cursor: pointer;
     color: var(--text);
-    transition: 0.2s;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: 0.25s ease;
 }
 
 .filter-btn.active,
 .filter-btn:hover {
     background: var(--accent);
     color: #000;
+    box-shadow: 0 0 12px var(--accent);
 }
 
 
