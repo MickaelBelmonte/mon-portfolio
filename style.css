@@ -235,5 +235,39 @@ footer {
     box-shadow: 0 0 20px var(--accent);
 }
 
+/* ------------------------------
+   PAGE PROJECTS
+--------------------------------*/
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.project-card {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 10px rgba(76, 201, 240, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(76, 201, 240, 0.4);
+}
+
+.project-card h3 {
+    margin-top: 10px;
+    color: var(--accent);
+}
+
+.project-card p {
+    opacity: 0.85;
+    margin: 10px 0 15px;
+}
+
 
 BY MICKAEL BELMONTE
