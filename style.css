@@ -1,89 +1,149 @@
+/* ------------------------------
+   RESET & BASE
+--------------------------------*/
+
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    color: #333;
+    font-family: "Inter", Arial, sans-serif;
+    background: #0d0d0d;
+    color: #e6e6e6;
+    line-height: 1.6;
 }
 
-/* Barre de navigation */
+/* ------------------------------
+   NAVBAR
+--------------------------------*/
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
-    background: #222;
-    color: white;
+    padding: 18px 40px;
+    background: rgba(20, 20, 20, 0.9);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #1f1f1f;
 }
 
 .logo {
-    margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #4cc9f0;
 }
 
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 15px;
-    margin: 0;
-    padding: 0;
+    gap: 25px;
 }
 
 .nav-links a {
-    color: white;
+    color: #e6e6e6;
     text-decoration: none;
     font-size: 0.95rem;
+    transition: 0.2s;
 }
 
 .nav-links a:hover {
-    text-decoration: underline;
+    color: #4cc9f0;
 }
 
-/* Section d'accueil */
+/* ------------------------------
+   HERO SECTION
+--------------------------------*/
 
 .hero {
     text-align: center;
-    padding: 80px 20px;
-    background: linear-gradient(135deg, #4c6ef5, #15aabf);
-    color: white;
+    padding: 120px 20px;
+    background: linear-gradient(135deg, #111, #1a1a1a);
+    border-bottom: 1px solid #1f1f1f;
 }
 
 .hero h2 {
-    font-size: 2rem;
-    margin-bottom: 10px;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #4cc9f0;
 }
 
 .hero p {
-    font-size: 1rem;
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto;
+    font-size: 1.1rem;
+    opacity: 0.85;
 }
 
 .btn {
     display: inline-block;
-    margin-top: 20px;
-    padding: 12px 25px;
-    background: white;
-    color: #333;
-    border-radius: 5px;
+    margin-top: 25px;
+    padding: 12px 28px;
+    background: #4cc9f0;
+    color: #0d0d0d;
+    border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
+    transition: 0.2s;
 }
 
 .btn:hover {
-    background: #f1f1f1;
+    background: #3bb3d8;
 }
 
-/* Pied de page */
+/* ------------------------------
+   CONTENT SECTIONS
+--------------------------------*/
+
+main {
+    padding: 40px 20px;
+    max-width: 900px;
+    margin: auto;
+}
+
+h2 {
+    margin-bottom: 15px;
+    color: #4cc9f0;
+}
+
+p, li {
+    opacity: 0.9;
+}
+
+/* ------------------------------
+   IMAGE STYLES
+--------------------------------*/
+
+.profile-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 20px auto;
+    display: block;
+    border: 3px solid #4cc9f0;
+}
+
+.project-img {
+    width: 100%;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 1px solid #1f1f1f;
+}
+
+/* ------------------------------
+   FOOTER
+--------------------------------*/
 
 footer {
     text-align: center;
-    padding: 15px;
-    background: #222;
-    color: white;
-    font-size: 0.85rem;
+    padding: 20px;
+    background: #111;
+    color: #777;
+    margin-top: 40px;
+    border-top: 1px solid #1f1f1f;
 }
+
+
+BY MICKAEL BELMONTE
