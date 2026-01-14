@@ -269,5 +269,21 @@ footer {
     margin: 10px 0 15px;
 }
 
+.project-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.project-tags span {
+    background: var(--accent);
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+
 
 BY MICKAEL BELMONTE
