@@ -4,35 +4,63 @@
     <meta charset="UTF-8">
     <title>Contact - Mon Portfolio</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        header {
+            margin: 0;
+            padding: 0;
+        }
+
+        .logo {
+            margin: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 0;
+        }
+    </style>
 </head>
-    <script src="particles.js"></script>
+
+<script src="particles.js"></script>
 <script src="script.js"></script>
+
 <body>
     <canvas id="particles"></canvas>
 
+    <header>
+        <nav class="navbar">
+            <h1 class="logo">Mon Portfolio</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="projects.html">Projets</a></li>
+                <li><a href="about.html">À propos</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <button id="theme-toggle" class="theme-btn">🌙</button>
+        </nav>
+    </header>
 
-<header>
-    <nav class="navbar">
-        <h1 class="logo">Mon Portfolio</h1>
-        <ul class="nav-links">
-            <li><a href="index.html">Accueil</a></li>
-            <li><a href="projects.html">Projets</a></li>
-            <li><a href="about.html">À propos</a></li>
-            <li><a href="contact.html">Contact</a></li>
-        </ul>
-        <button id="theme-toggle" class="theme-btn">🌙</button>
-    </nav>
-</header>
+    <main style="padding: 20px;">
+        <h2>Contact</h2>
+        <p>Email : belmonte.mickael@gmail.com</p>
+        <p>LinkedIn : <a href="https://fr.linkedin.com/in/micka%C3%ABl-belmonte-04051414a" target="_blank">MICKAEL BELMONTE</a></p>
+    </main>
 
-<main style="padding: 20px;">
-    <h2>Contact</h2>
-    <p>Email : belmonte.mickael@gmail.com</p>
-    <p>LinkedIn : <a href="https://fr.linkedin.com/in/micka%C3%ABl-belmonte-04051414a" target="_blank">MICKAEL BELMONTE</a></p>
-</main>
-
-<footer>
-    <p>© 2026 - MICKAEL BELMONTE</p>
-</footer>
+    <footer>
+        <p>© 2026 - MICKAEL BELMONTE</p>
+    </footer>
 
 </body>
 </html>
