@@ -198,6 +198,14 @@ function update() {
     // Ennemis
     enemies.forEach(e => e.y += e.speed);
 
+    // Si un ennemi sort de l'écran → perdre une vie
+enemies.forEach((enemy, ei) => {
+    if (enemy.y > canvas.height) {
+        enemies.splice(ei, 1);
+        loseLife();
+    }
+});
+
     // Collisions tirs / ennemis
     enemies.forEach((enemy, ei) => {
         player.bullets.forEach((bullet, bi) => {
@@ -312,8 +320,8 @@ function spawnBoss() {
     boss = {
         x: canvas.width / 2 - 180,
         y: 20,
-        width: 360,
-        height: 360,
+        width: 180,
+        height: 180,
         emoji: "🐒",
         speedX: 3
     };
