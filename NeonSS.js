@@ -1,33 +1,36 @@
-
-// Canvas du jeu
+// ===============================
+//  CANVAS
+// ===============================
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 900;
 canvas.height = 600;
 
-// Éléments du menu et HUD
+// ===============================
+//  UI & HUD
+// ===============================
 const menu = document.getElementById("game-menu");
 const startBtn = document.getElementById("start-btn");
 const hud = document.getElementById("hud");
 const scoreDisplay = document.getElementById("score");
 const timerDisplay = document.getElementById("timer");
-
-// Easter Egg
 const bonoboMessage = document.getElementById("bonobo-message");
+const livesDisplay = document.getElementById("lives");
 
 // Leaderboard + Endless
 let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
 let isEndless = false;
 
-// Variables globales
+// ===============================
+//  VARIABLES GLOBALES
+// ===============================
 let gameRunning = false;
 let score = 0;
 let timeElapsed = 0;
 let gameInterval = null;
 let enemySpawnInterval = null;
 let lives = 3;
-
 
 // Entités
 let enemies = [];
@@ -40,9 +43,58 @@ let bossActive = false;
 let bossHP = 50;
 
 // ===============================
+//  JOUEUR
+// ===============================
+const player = {
+    x: canvas.width / 2 - 20,
+    y: canvas.height - 80,
+    width: 40,
+    height: 40,
+    speed: 10,
+    bullets: [],
+    shots: 0
+};
+
+let keys = {};
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+// Tir
+document.addEventListener("keydown", e => {
+    if (e.key === " " && gameRunning) {
+        player.bullets.push({
+            x: player.x + player.width / 2 - 10,
+            y: player.y,
+            emoji: "🧤",
+            size: 30,
+            speed: 10
+        });
+        player.shots++;
+    }
+});
+
+// ===============================
+//  VIES
+// ===============================
+function updateLivesDisplay() {
+    let hearts = "";
+    for (let i = 0; i < lives; i++) {
+        hearts += "❤️";
+    }
+    livesDisplay.textContent = "Vies : " + hearts;
+}
+
+function loseLife() {
+    lives--;
+    updateLivesDisplay();
+    if (lives <= 0) {
+        gameOver();
+    }
+}
+
+// ===============================
 //  LANCEMENT DU JEU
 // ===============================
-
 startBtn.addEventListener("click", () => {
     isEndless = false;
     startGame();
@@ -72,8 +124,8 @@ function startGame() {
     player.shots = 0;
 
     // Nettoyage des intervalles
-    if (gameInterval) clearInterval(gameInterval);
-    if (enemySpawnInterval) clearInterval(enemySpawnInterval);
+    clearInterval(gameInterval);
+    clearInterval(enemySpawnInterval);
 
     // Timer
     gameInterval = setInterval(() => {
@@ -99,9 +151,8 @@ function startGame() {
 }
 
 // ===============================
-//  BOUCLE PRINCIPALE DU JEU
+//  BOUCLE PRINCIPALE
 // ===============================
-
 function gameLoop() {
     if (!gameRunning) return;
 
@@ -116,64 +167,16 @@ function gameLoop() {
 }
 
 // ===============================
-//  JOUEUR
-// ===============================
-
-const player = {
-    x: canvas.width / 2 - 20,
-    y: canvas.height - 80,
-    width: 40,
-    height: 40,
-    speed: 10,
-    color: "#4cc9f0",
-    bullets: []
-};
-
-let keys = {};
-
-document.addEventListener("keydown", e => keys[e.key] = true);
-document.addEventListener("keyup", e => keys[e.key] = false);
-
-// Tir
-document.addEventListener("keydown", e => {
-    if (e.key === " " && gameRunning) {
-player.bullets.push({
-    x: player.x + player.width / 2 - 10,
-    y: player.y,
-    emoji: "🧤",
-    size: 30,   // taille de l’emoji
-    speed: 10
-});
-
-
-        player.shots++; // ← compteur de tirs
-    }
-});
-
-
-function loseLife() {
-    lives--;
-
-    if (lives <= 0) {
-        gameOver();
-    }
-}
-const livesDisplay = document.getElementById("lives");
-
-shots: 0
-
-// ===============================
 //  ENNEMIS
 // ===============================
-
 let enemySpeed = 2;
 
 function spawnEnemy() {
-    const enemyEmojis = ["🙊", "🙉", "🙈","🐵"];
+    const enemyEmojis = ["🙊", "🙉", "🙈", "🐵"];
 
     enemies.push({
-        x: Math.random() * (canvas.width - 40),
-        y: -40,
+        x: Math.random() * (canvas.width - 80),
+        y: -80,
         emoji: enemyEmojis[Math.floor(Math.random() * enemyEmojis.length)],
         size: 80,
         speed: enemySpeed
@@ -183,104 +186,90 @@ function spawnEnemy() {
 // ===============================
 //  UPDATE
 // ===============================
-
 function update() {
     // Déplacement du joueur
     if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
     if (keys["ArrowRight"] && player.x < canvas.width - player.width) player.x += player.speed;
 
     // Tirs
-player.bullets.forEach(b => b.y -= b.speed);
-player.bullets = player.bullets.filter(b => b.y > -50);
+    player.bullets.forEach(b => b.y -= b.speed);
+    player.bullets = player.bullets.filter(b => b.y > -50);
 
     // Ennemis
-enemies.forEach(e => e.y += e.speed);
-
+    enemies.forEach(e => e.y += e.speed);
 
     // Collisions tirs / ennemis
-// Collision tirs / ennemis
-enemies.forEach((enemy, ei) => {
-    player.bullets.forEach((bullet, bi) => {
+    enemies.forEach((enemy, ei) => {
+        player.bullets.forEach((bullet, bi) => {
+            if (
+                bullet.x < enemy.x + enemy.size &&
+                bullet.x + bullet.size > enemy.x &&
+                bullet.y < enemy.y + enemy.size &&
+                bullet.y + bullet.size > enemy.y
+            ) {
+                score += isEndless ? 20 : 10;
+
+                createExplosion(
+                    enemy.x + enemy.size / 2,
+                    enemy.y + enemy.size / 2
+                );
+
+                enemies.splice(ei, 1);
+                player.bullets.splice(bi, 1);
+            }
+        });
+    });
+
+    // Supprimer les ennemis sortis de l'écran
+    enemies = enemies.filter(e => e.y < canvas.height + 50);
+
+    // Explosions
+    explosions.forEach((p, i) => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.alpha -= 0.03;
+        if (p.alpha <= 0) explosions.splice(i, 1);
+    });
+
+    updateBoss();
+
+    // Collision banane / joueur
+    bananas.forEach((b, bi) => {
         if (
-            bullet.x < enemy.x + enemy.size &&
-            bullet.x + bullet.size > enemy.x &&
-            bullet.y < enemy.y + enemy.size &&
-            bullet.y + bullet.size > enemy.y
+            b.x < player.x + player.width &&
+            b.x + b.size > player.x &&
+            b.y < player.y + player.height &&
+            b.y + b.size > player.y
         ) {
-            score += isEndless ? 20 : 10;
-
-            createExplosion(
-                enemy.x + enemy.size / 2,
-                enemy.y + enemy.size / 2
-            );
-
-            enemies.splice(ei, 1);
-            player.bullets.splice(bi, 1);
+            bananas.splice(bi, 1);
+            loseLife();
         }
     });
-});
 
-
-// Supprimer les ennemis sortis de l'écran
-enemies = enemies.filter(e => e.y < canvas.height + 50);
-
-// Explosions
-explosions.forEach((p, i) => {
-    p.x += p.speedX;
-    p.y += p.speedY;
-    p.alpha -= 0.03;
-    if (p.alpha <= 0) explosions.splice(i, 1);
-});
-
-updateBoss();
-
-// Collision banane / joueur
-bananas.forEach((b, bi) => {
-    if (
-        b.x < player.x + player.width &&
-        b.x + b.size > player.x &&
-        b.y < player.y + player.height &&
-        b.y + b.size > player.y
-    ) {
-        bananas.splice(bi, 1);
-        loseLife();
-    }
-});
-
-bananas.forEach((b, bi) => {
-    if (
-        b.x < player.x + player.width &&
-        b.x + b.size > player.x &&
-        b.y < player.y + player.height &&
-        b.y + b.size > player.y
-    ) {
-        bananas.splice(bi, 1);
-        loseLife();
-    }
-});
+    // Supprimer les bananes hors écran
+    bananas = bananas.filter(b => b.y < canvas.height + 50);
+}
 
 // ===============================
 //  DRAW
 // ===============================
-
 function draw() {
     // Joueur
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
 
     // Tirs
-player.bullets.forEach(b => {
-    ctx.font = b.size + "px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(b.emoji, b.x, b.y);
-});
+    player.bullets.forEach(b => {
+        ctx.font = b.size + "px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(b.emoji, b.x, b.y);
+    });
 
     // Ennemis
     enemies.forEach(e => {
-ctx.font = e.size + "px Arial";
-ctx.textAlign = "center";
-ctx.fillText(e.emoji, e.x + e.size / 2, e.y + e.size);
-
+        ctx.font = e.size + "px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(e.emoji, e.x + e.size / 2, e.y + e.size);
     });
 
     // Explosions
@@ -299,7 +288,6 @@ ctx.fillText(e.emoji, e.x + e.size / 2, e.y + e.size);
 // ===============================
 //  EXPLOSIONS
 // ===============================
-
 function createExplosion(x, y) {
     for (let i = 0; i < 12; i++) {
         explosions.push({
@@ -317,20 +305,18 @@ function createExplosion(x, y) {
 // ===============================
 //  BOSS
 // ===============================
-
 function spawnBoss() {
     bossActive = true;
     bossHP = 50;
 
-boss = {
-    x: canvas.width / 2 - 180, // centré
-    y: 20,
-    width: 360,
-    height: 360,
-    emoji: "🐒",
-    speedX: 3
-};
-
+    boss = {
+        x: canvas.width / 2 - 180,
+        y: 20,
+        width: 360,
+        height: 360,
+        emoji: "🐒",
+        speedX: 3
+    };
 }
 
 function bossAttack() {
@@ -339,9 +325,8 @@ function bossAttack() {
     bananas.push({
         x: boss.x + boss.width / 2,
         y: boss.y + boss.height,
-        width: 20,
-        height: 20,
         emoji: "🍌",
+        size: 30,
         speedY: 4,
         angle: (Math.random() - 0.5) * 2
     });
@@ -354,9 +339,13 @@ setInterval(() => {
 function updateBoss() {
     if (!bossActive || !boss) return;
 
+    // Déplacement horizontal
     boss.x += boss.speedX;
-    if (boss.x <= 0 || boss.x + boss.width >= canvas.width) boss.speedX *= -1;
+    if (boss.x <= 0 || boss.x + boss.width >= canvas.width) {
+        boss.speedX *= -1;
+    }
 
+    // Déplacement des bananes
     bananas.forEach(b => {
         b.y += b.speedY;
         b.x += b.angle;
@@ -383,33 +372,57 @@ function updateBoss() {
         }
     });
 
+    // Nettoyage des bananes hors écran
     bananas = bananas.filter(b => b.y < canvas.height + 50);
 }
 
 function drawBoss() {
-    if (bossActive && boss) {
-        ctx.font = "360px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 40);
-        
-        ctx.fillStyle = "#ff0054";
-        ctx.fillRect(boss.x, boss.y - 25, boss.width, 20);
+    if (!bossActive || !boss) return;
 
-        ctx.fillStyle = "#4cc9f0";
-        ctx.fillRect(boss.x, boss.y - 25, (bossHP / 50) * boss.width, 20);
+    // Boss
+    ctx.font = "360px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 40);
 
+    // Barre de vie
+    ctx.fillStyle = "#ff0054";
+    ctx.fillRect(boss.x, boss.y - 25, boss.width, 20);
 
+    ctx.fillStyle = "#4cc9f0";
+    ctx.fillRect(boss.x, boss.y - 25, (bossHP / 50) * boss.width, 20);
+
+    // Bananes
     bananas.forEach(b => {
         ctx.font = "30px Arial";
         ctx.fillText(b.emoji, b.x, b.y);
     });
-    }
+}
+
+// ===============================
+//  GAME OVER
+// ===============================
+function gameOver() {
+    gameRunning = false;
+    clearInterval(gameInterval);
+    clearInterval(enemySpawnInterval);
+
+    let name = prompt("Game Over ! Entre ton pseudo pour le leaderboard :");
+    if (!name) name = "Anonyme";
+
+    saveScore(name, score);
+    showLeaderboard();
+    showEndlessButton();
+
+    bonoboMessage.style.display = "block";
+    bonoboMessage.innerHTML = `
+        <h2>GAME OVER</h2>
+        <p>Dommage ! Retente ta chance !</p>
+    `;
 }
 
 // ===============================
 //  BONOBOS + LEADERBOARD + ENDLESS
 // ===============================
-
 function triggerBonoboEasterEgg() {
     gameRunning = false;
     clearInterval(gameInterval);
@@ -441,22 +454,19 @@ function saveScore(name, score) {
     localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
 }
 
-
 function showLeaderboard() {
     const box = document.getElementById("leaderboard");
     box.innerHTML = "<h3>Leaderboard</h3>";
 
     leaderboard.forEach((entry, i) => {
-        
-box.innerHTML += `
-    <p>
-        ${i + 1}. ${entry.name} — 
-        ${entry.score} pts — 
-        ${entry.shots} tirs — 
-        Ratio : ${entry.ratio}
-    </p>
-`;
-
+        box.innerHTML += `
+            <p>
+                ${i + 1}. ${entry.name} — 
+                ${entry.score} pts — 
+                ${entry.shots} tirs — 
+                Ratio : ${entry.ratio}
+            </p>
+        `;
     });
 }
 
