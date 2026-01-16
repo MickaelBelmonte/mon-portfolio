@@ -30,9 +30,9 @@ let lives = 3;
 
 
 // Entités
-let enemies = [];
+let enemies = [🐵];
 let explosions = [];
-let bananas = [];
+let bananas = [🍌];
 
 // Boss
 let boss = null;
@@ -126,7 +126,7 @@ const player = {
     height: 40,
     speed: 10,
     color: "#4cc9f0",
-    bullets: []
+    bullets: [🧤]
 };
 
 let keys = {};
