@@ -370,14 +370,15 @@ function spawnBoss() {
     bossActive = true;
     bossHP = 50;
 
-    boss = {
-        x: canvas.width / 2 - 60,
-        y: 50,
-        width: 120,
-        height: 120,
-        emoji: "🐒",
-        speedX: 3
-    };
+boss = {
+    x: canvas.width / 2 - 180, // centré
+    y: 20,
+    width: 360,
+    height: 360,
+    emoji: "🐒",
+    speedX: 3
+};
+
 }
 
 function bossAttack() {
@@ -437,14 +438,14 @@ function drawBoss() {
     if (bossActive && boss) {
         ctx.font = "360px Arial";
         ctx.textAlign = "center";
-        ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 10);
-
+        ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 40);
+        
         ctx.fillStyle = "#ff0054";
-        ctx.fillRect(boss.x, boss.y - 15, boss.width, 10);
+        ctx.fillRect(boss.x, boss.y - 25, boss.width, 20);
 
         ctx.fillStyle = "#4cc9f0";
-        ctx.fillRect(boss.x, boss.y - 15, (bossHP / 50) * boss.width, 10);
-    }
+        ctx.fillRect(boss.x, boss.y - 25, (bossHP / 50) * boss.width, 20);
+
 
     bananas.forEach(b => {
         ctx.font = "30px Arial";
