@@ -30,9 +30,9 @@ let lives = 3;
 
 
 // Entités
-let enemies = [🐵];
+let enemies = [];
 let explosions = [];
-let bananas = [🍌];
+let bananas = [];
 
 // Boss
 let boss = null;
@@ -168,12 +168,18 @@ shots: 0
 let enemySpeed = 2;
 
 function spawnEnemy() {
+    const enemyEmojis = ["🙊", "🙉", "🙈","🐵"];
+
     enemies.push({
         x: Math.random() * (canvas.width - 40),
         y: -40,
-        width: 40,
-        height: 40,
-        color: "#ff0054"
+        emoji: enemyEmojis[Math.floor(Math.random() * enemyEmojis.length)],
+        size: 80,
+        speed: enemySpeed
+    });
+}
+
+
     });
 }
 
@@ -191,16 +197,18 @@ function update() {
     player.bullets = player.bullets.filter(b => b.y > -20);
 
     // Ennemis
-    enemies.forEach(e => e.y += enemySpeed);
+enemies.forEach(e => e.y += e.speed);
+
 
     // Collisions tirs / ennemis
     enemies.forEach((enemy, ei) => {
         player.bullets.forEach((bullet, bi) => {
             if (
-                bullet.x < enemy.x + enemy.width &&
-                bullet.x + bullet.width > enemy.x &&
-                bullet.y < enemy.y + enemy.height &&
-                bullet.y + bullet.height > enemy.y
+           bullet.x < enemy.x + e.size &&
+           bullet.x + bullet.width > enemy.x &&
+           bullet.y < enemy.y + e.size &&
+           bullet.y + bullet.height > enemy.y
+                
             ) {
                 score += isEndless ? 20 : 10;
                 createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2);
@@ -317,8 +325,10 @@ function draw() {
 
     // Ennemis
     enemies.forEach(e => {
-        ctx.fillStyle = e.color;
-        ctx.fillRect(e.x, e.y, e.width, e.height);
+ctx.font = e.size + "px Arial";
+ctx.textAlign = "center";
+ctx.fillText(e.emoji, e.x + e.size / 2, e.y + e.size);
+
     });
 
     // Explosions
@@ -425,7 +435,7 @@ function updateBoss() {
 
 function drawBoss() {
     if (bossActive && boss) {
-        ctx.font = "90px Arial";
+        ctx.font = "360px Arial";
         ctx.textAlign = "center";
         ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 10);
 
