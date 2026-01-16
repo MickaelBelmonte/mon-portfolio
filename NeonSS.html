@@ -23,8 +23,25 @@
         </nav>
     </header>
 
-    <main style="padding: 0; margin: 0;">
-        <canvas id="gameCanvas"></canvas>
+    <main class="neonss-main">
+        <div id="game-menu" class="game-menu">
+            <h2 class="game-title neon">Neon Space Shooter</h2>
+            <p class="game-subtitle">Déplace-toi, tire, survie... et affronte le Singe Cosmique.</p>
+            <button id="start-btn" class="btn game-btn">Jouer</button>
+        </div>
+
+        <div class="game-wrapper">
+            <canvas id="gameCanvas"></canvas>
+            <div id="hud" class="hud">
+                <span id="score">Score : 0</span>
+                <span id="timer">Temps : 0s</span>
+            </div>
+        </div>
+
+        <div id="bonobo-message" class="bonobo-message">
+            <h2>Bienvenue dans le Royaume des Bonobos</h2>
+            <p>Tu as vaincu le Singe Cosmique.</p>
+        </div>
     </main>
 
     <footer>
@@ -36,3 +53,4 @@
     <script src="NeonSS.js"></script>
 </body>
 </html>
+
