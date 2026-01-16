@@ -338,7 +338,22 @@ function triggerBonoboEasterEgg() {
     clearInterval(gameInterval);
 
     bonoboMessage.style.display = "block";
-    bonoboMessage.style.animation = "fadeIn 2s ease forwards";
+    bonoboMessage.innerHTML = `
+        <h2>Bienvenue dans le Royaume des Bonobos</h2>
+        <p>Tu as vaincu le Singe Cosmique.</p>
+    `;
+
+    // Leaderboard
+    let name = prompt("Entre ton pseudo pour le leaderboard :");
+    if (!name) name = "Anonyme";
+
+    saveScore(name, score);
+    showLeaderboard();
+
+    // Bouton Mode Endless
+    showEndlessButton();
+}
+
 }
 
 function saveScore(name, score) {
@@ -347,6 +362,21 @@ function saveScore(name, score) {
     leaderboard = leaderboard.slice(0, 10); // Top 10
     localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
 }
+
+function showEndlessButton() {
+    const box = document.getElementById("endless-btn-box");
+
+    box.innerHTML = `
+        <button id="endless-btn" class="btn" style="margin-top:20px;">
+            Activer le Mode Endless
+        </button>
+    `;
+
+    document.getElementById("endless-btn").addEventListener("click", () => {
+        startEndlessMode();
+    });
+}
+
 
 }
 function showLeaderboard() {
@@ -362,3 +392,39 @@ if (!name) name = "Anonyme";
 
 saveScore(name, score);
 showLeaderboard();
+
+function startEndlessMode() {
+    // Reset minimal
+    bonoboMessage.style.display = "none";
+    document.getElementById("leaderboard").innerHTML = "";
+    document.getElementById("endless-btn-box").innerHTML = "";
+
+    enemies = [];
+    player.bullets = [];
+    bananas = [];
+    bossActive = false;
+    boss = null;
+
+    enemySpeed = 3; // un peu plus rapide
+    score = 0;
+    timeElapsed = 0;
+
+    gameRunning = true;
+
+    // Spawn plus rapide
+    endlessSpawn = setInterval(() => {
+        if (gameRunning) {
+            spawnEnemy();
+            spawnEnemy(); // double spawn
+        }
+    }, 700);
+
+    // Timer
+    gameInterval = setInterval(() => {
+        timeElapsed++;
+        timerDisplay.textContent = "Temps : " + timeElapsed + "s";
+    }, 1000);
+
+    requestAnimationFrame(gameLoop);
+}
+
