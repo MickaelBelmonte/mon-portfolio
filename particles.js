@@ -1,14 +1,14 @@
-const canvas = document.getElementById("particles");
-const ctx = canvas.getContext("2d");
+const particlesCanvas = document.getElementById("particles");
+const particlesCtx = particlesCanvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+particlesCanvas.width = window.innerWidth;
+particlesCanvas.height = window.innerHeight;
 
 let particlesArray = [];
 const mouse = {
     x: null,
     y: null,
-    radius: 120 // zone d’attraction
+    radius: 120
 };
 
 window.addEventListener("mousemove", (event) => {
@@ -18,8 +18,8 @@ window.addEventListener("mousemove", (event) => {
 
 class Particle {
     constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * particlesCanvas.width;
+        this.y = Math.random() * particlesCanvas.height;
         this.size = Math.random() * 2 + 1;
         this.baseX = this.x;
         this.baseY = this.y;
@@ -27,13 +27,13 @@ class Particle {
     }
 
     draw() {
-        ctx.fillStyle = "rgba(76, 201, 240, 0.9)";
-        ctx.shadowColor = "rgba(76, 201, 240, 1)";
-        ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fill();
+        particlesCtx.fillStyle = "rgba(76, 201, 240, 0.9)";
+        particlesCtx.shadowColor = "rgba(76, 201, 240, 1)";
+        particlesCtx.shadowBlur = 12;
+        particlesCtx.beginPath();
+        particlesCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        particlesCtx.closePath();
+        particlesCtx.fill();
     }
 
     update() {
@@ -42,11 +42,9 @@ class Particle {
         let distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < mouse.radius) {
-            // Attraction vers la souris
             this.x += dx / 20;
             this.y += dy / 20;
         } else {
-            // Retour à la position initiale
             if (this.x !== this.baseX) {
                 let dxBack = this.x - this.baseX;
                 this.x -= dxBack / 40;
@@ -67,7 +65,7 @@ function initParticles() {
 }
 
 function animateParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particlesCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
 
     particlesArray.forEach(p => {
         p.update();
@@ -78,8 +76,8 @@ function animateParticles() {
 }
 
 window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    particlesCanvas.width = window.innerWidth;
+    particlesCanvas.height = window.innerHeight;
     initParticles();
 });
 
