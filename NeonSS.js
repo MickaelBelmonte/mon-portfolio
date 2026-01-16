@@ -198,114 +198,64 @@ enemies.forEach(e => e.y += e.speed);
 
 
     // Collisions tirs / ennemis
-    enemies.forEach((enemy, ei) => {
-        player.bullets.forEach((bullet, bi) => {
-            if (
-           bullet.x < enemy.x + e.size &&
-           bullet.x + bullet.size > enemy.x &&
-           bullet.y < enemy.y + e.size &&
-           bullet.y + bullet.size > enemy.y
-                
-            ) {
-                score += isEndless ? 20 : 10;
-                createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2);
-                enemies.splice(ei, 1);
-                player.bullets.splice(bi, 1);
-            }
-        });
+// Collision tirs / ennemis
+enemies.forEach((enemy, ei) => {
+    player.bullets.forEach((bullet, bi) => {
+        if (
+            bullet.x < enemy.x + enemy.size &&
+            bullet.x + bullet.size > enemy.x &&
+            bullet.y < enemy.y + enemy.size &&
+            bullet.y + bullet.size > enemy.y
+        ) {
+            score += isEndless ? 20 : 10;
+            createExplosion(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2);
+            enemies.splice(ei, 1);
+            player.bullets.splice(bi, 1);
+        }
     });
+});
 
-    enemies = enemies.filter(e => e.y < canvas.height + 50);
+// Supprimer les ennemis sortis de l'écran
+enemies = enemies.filter(e => e.y < canvas.height + 50);
 
-    // Explosions
-    explosions.forEach((p, i) => {
-        p.x += p.speedX;
-        p.y += p.speedY;
-        p.alpha -= 0.03;
-        if (p.alpha <= 0) explosions.splice(i, 1);
-    });
+// Explosions
+explosions.forEach((p, i) => {
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.alpha -= 0.03;
+    if (p.alpha <= 0) explosions.splice(i, 1);
+});
 
-    updateBoss();
-    
+updateBoss();
+
 // Collision banane / joueur
 bananas.forEach((b, bi) => {
     if (
         b.x < player.x + player.width &&
-        b.x + b.width > player.x &&
+        b.x + b.size > player.x &&
         b.y < player.y + player.height &&
-        b.y + b.height > player.y
+        b.y + b.size > player.y
     ) {
         bananas.splice(bi, 1);
         loseLife();
     }
 });
 
-    if (enemy.y > canvas.height) {
-    enemies.splice(ei, 1);
-    loseLife();
-}
+// (SUPPRIMÉ) ❌ Ce bloc était illégal
+// if (enemy.y > canvas.height) { ... }
 
-    bananas.forEach((b, bi) => {
+// Collision banane / joueur (doublon supprimable si tu veux)
+bananas.forEach((b, bi) => {
     if (
         b.x < player.x + player.width &&
-        b.x + b.width > player.x &&
+        b.x + b.size > player.x &&
         b.y < player.y + player.height &&
-        b.y + b.height > player.y
+        b.y + b.size > player.y
     ) {
         bananas.splice(bi, 1);
         loseLife();
     }
 });
-
-    
-}
-
-// Si un ennemi sort de l'écran → perdre une vie
-enemies.forEach((enemy, ei) => {
-    if (enemy.y > canvas.height) {
-        enemies.splice(ei, 1);
-        loseLife();
-    }
-});
-
-function gameOver() {
-    gameRunning = false;
-    clearInterval(gameInterval);
-    clearInterval(enemySpawnInterval);
-
-    let name = prompt("Game Over ! Entre ton pseudo pour le leaderboard :");
-    if (!name) name = "Anonyme";
-
-    saveScore(name, score);
-    showLeaderboard();
-    showEndlessButton();
-
-    // Affiche un message Game Over
-    bonoboMessage.style.display = "block";
-    bonoboMessage.innerHTML = `
-        <h2>GAME OVER</h2>
-        <p>Dommage ! Retente ta chance !</p>
-    `;
-}
-
-function updateLivesDisplay() {
-    let hearts = "";
-    for (let i = 0; i < lives; i++) {
-        hearts += "❤️";
-    }
-    livesDisplay.textContent = "Vies : " + hearts;
-}
-
-function loseLife() {
-    lives--;
-    updateLivesDisplay();
-
-    if (lives <= 0) {
-        gameOver();
-    }
-}
-
-
 
 // ===============================
 //  DRAW
