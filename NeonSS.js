@@ -477,7 +477,6 @@ function triggerBonoboEasterEgg() {
 }
 
 function saveScore(name, score) {
-    function saveScore(name, score) {
     const shots = player.shots;
     const ratio = shots > 0 ? (score / shots).toFixed(2) : score;
 
