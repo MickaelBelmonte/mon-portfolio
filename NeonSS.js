@@ -1,7 +1,3 @@
-// ===============================
-//  NEON SPACE SHOOTER
-//  Base + Menu + Timer + Score
-// ===============================
 
 // Canvas du jeu
 const ctx = canvas.getContext("2d");
