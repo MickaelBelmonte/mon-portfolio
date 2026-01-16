@@ -345,8 +345,9 @@ function saveScore(name, score) {
     leaderboard.push({ name, score });
     leaderboard.sort((a, b) => b.score - a.score);
     leaderboard = leaderboard.slice(0, 10); // Top 10
-
     localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+}
+
 }
 function showLeaderboard() {
     const box = document.getElementById("leaderboard");
