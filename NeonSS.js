@@ -451,6 +451,7 @@ function drawBoss() {
         ctx.font = "30px Arial";
         ctx.fillText(b.emoji, b.x, b.y);
     });
+    }
 }
 
 // ===============================
