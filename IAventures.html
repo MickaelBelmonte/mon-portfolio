@@ -4,47 +4,46 @@
     <meta charset="UTF-8">
         <title>L'IAventures !</title>
             <link rel="stylesheet" href="style.css">
-            </head>
+ </head>
 
-            <body>
-                <canvas id="particles"></canvas>
+     <body>
+          <canvas id="particles"></canvas>
 
-                    <header>
-                            <nav class="navbar">
-                                        <h1 class="logo">Mini IA Aventures</h1>
-                                                    <ul class="nav-links">
-                                                                    <li><a href="index.html">Accueil</a></li>
-                                                                                    <li><a href="projects.html">Projets</a></li>
-                                                                                                </ul>
-                                                                                                            <button id="theme-toggle" class="theme-btn">🌙</button>
-                                                                                                                    </nav>
-                                                                                                                        </header>
+ <header>
+           <nav class="navbar">
+           <h1 class="logo">Mini IA Aventures</h1>
+           <ul class="nav-links">
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="projects.html">Projets</a></li>
+           </ul>
+                           <button id="theme-toggle" class="theme-btn">🌙</button>
+                    </nav>
+ </header>
 
-                                                                                                                            <main style="padding: 20px; max-width: 900px; margin: auto;">
-                                                                                                                                    <h2 class="neon">Bienvenue sur mon IAventures !</h2>
+          <main style="padding: 20px; max-width: 900px; margin: auto;">
+                  <h2 class="neon">Bienvenue sur mon IAventures !</h2>
+                      
+                  <p style="opacity: 0.8;">
+                  Un générateur d'aventure comme le ferai une "IA" très basique avec quelques bases.
+                  </p>
 
-                                                                                                                                            <p style="opacity: 0.8;">
-                                                                                                                                                        Explore des mondes impossibles, crée des univers, génère des créatures, des cartes et des histoires.
-                                                                                                                                                                </p>
+                       <div style="margin: 20px 0;">
+                          <button class="btn" onclick="genererAventure()">Aventure aléatoire</button>
+                          <button class="btn" onclick="exploration()">Exploration</button>
+                          <button class="btn" onclick="creationMonde()">Créer un monde</button>
+                          <button class="btn" onclick="genererCreature()">Créer une créature</button>
+                          <button class="btn" onclick="genererCarte()">Carte ASCII</button>
+                          <button class="btn" onclick="genererHistoire()">Histoire complète</button>
+                       </div>
 
-                                                                                                                                                                        <div style="margin: 20px 0;">
-                                                                                                                                                                                    <button class="btn" onclick="genererAventure()">Aventure aléatoire</button>
-                                                                                                                                                                                                <button class="btn" onclick="exploration()">Exploration</button>
-                                                                                                                                                                                                            <button class="btn" onclick="creationMonde()">Créer un monde</button>
-                                                                                                                                                                                                                        <button class="btn" onclick="genererCreature()">Créer une créature</button>
-                                                                                                                                                                                                                                    <button class="btn" onclick="genererCarte()">Carte ASCII</button>
-                                                                                                                                                                                                                                                <button class="btn" onclick="genererHistoire()">Histoire complète</button>
-                                                                                                                                                                                                                                                        </div>
+                              <pre id="output" class="output-box"></pre>
+         </main>
+                      <footer>
+                             <p>© 2026 - MICKAEL BELMONTE</p>
+                      </footer>
 
-                                                                                                                                                                                                                                                                <pre id="output" class="output-box"></pre>
-                                                                                                                                                                                                                                                                    </main>
-
-                                                                                                                                                                                                                                                                        <footer>
-                                                                                                                                                                                                                                                                                <p>© 2026 - MICKAEL BELMONTE</p>
-                                                                                                                                                                                                                                                                                    </footer>
-
-                                                                                                                                                                                                                                                                                        <script src="particles.js"></script>
-                                                                                                                                                                                                                                                                                            <script src="script.js"></script>
-                                                                                                                                                                                                                                                                                                <script src="iAventures.js"></script>
-                                                                                                                                                                                                                                                                                                </body>
+                            <script src="particles.js"></script>
+                            <script src="script.js"></script>
+                            <script src="iAventures.js"></script>
+      </body>
                                                                                                                                                                                                                                                                                                 </html>
