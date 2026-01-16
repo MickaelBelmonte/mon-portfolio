@@ -4,7 +4,7 @@
 // ===============================
 
 // Canvas du jeu
-const canvas = document.getElementById("gameCanvas"); 
+const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 900;
@@ -56,10 +56,8 @@ function startGame() {
     hud.style.display = "flex";
     bonoboMessage.style.display = "none";
 
-    const leaderboardBox = document.getElementById("leaderboard");
-    const endlessBox = document.getElementById("endless-btn-box");
-    if (leaderboardBox) leaderboardBox.innerHTML = "";
-    if (endlessBox) endlessBox.innerHTML = "";
+    document.getElementById("leaderboard").innerHTML = "";
+    document.getElementById("endless-btn-box").innerHTML = "";
 
     // Reset état
     gameRunning = true;
@@ -81,7 +79,6 @@ function startGame() {
         timeElapsed++;
         timerDisplay.textContent = "Temps : " + timeElapsed + "s";
 
-        // Apparition du boss après 120s en mode normal uniquement
         if (!isEndless && timeElapsed === 120 && !bossActive) {
             spawnBoss();
         }
@@ -92,14 +89,11 @@ function startGame() {
     enemySpawnInterval = setInterval(() => {
         if (gameRunning && !bossActive) {
             spawnEnemy();
-            if (isEndless) {
-                // Double spawn en Endless
-                spawnEnemy();
-            }
+            if (isEndless) spawnEnemy();
         }
     }, spawnDelay);
 
-    // Lancement de la boucle du jeu
+    // Lancement du jeu
     requestAnimationFrame(gameLoop);
 }
 
@@ -119,6 +113,7 @@ function gameLoop() {
 
     requestAnimationFrame(gameLoop);
 }
+
 // ===============================
 //  JOUEUR
 // ===============================
@@ -138,7 +133,7 @@ let keys = {};
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
-// Tir (barre lumineuse)
+// Tir
 document.addEventListener("keydown", e => {
     if (e.key === " " && gameRunning) {
         player.bullets.push({
@@ -168,7 +163,7 @@ function spawnEnemy() {
 }
 
 // ===============================
-//  MISE À JOUR DU JEU
+//  UPDATE
 // ===============================
 
 function update() {
@@ -176,14 +171,14 @@ function update() {
     if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
     if (keys["ArrowRight"] && player.x < canvas.width - player.width) player.x += player.speed;
 
-    // Déplacement des tirs
+    // Tirs
     player.bullets.forEach(b => b.y -= b.speed);
     player.bullets = player.bullets.filter(b => b.y > -20);
 
-    // Déplacement des ennemis
+    // Ennemis
     enemies.forEach(e => e.y += enemySpeed);
 
-    // Collision tirs / ennemis
+    // Collisions tirs / ennemis
     enemies.forEach((enemy, ei) => {
         player.bullets.forEach((bullet, bi) => {
             if (
@@ -200,10 +195,9 @@ function update() {
         });
     });
 
-    // Supprimer les ennemis hors écran
     enemies = enemies.filter(e => e.y < canvas.height + 50);
 
-    // Mise à jour des explosions
+    // Explosions
     explosions.forEach((p, i) => {
         p.x += p.speedX;
         p.y += p.speedY;
@@ -211,12 +205,11 @@ function update() {
         if (p.alpha <= 0) explosions.splice(i, 1);
     });
 
-    // Mise à jour du boss et des bananes
     updateBoss();
 }
 
 // ===============================
-//  DESSIN
+//  DRAW
 // ===============================
 
 function draw() {
@@ -244,18 +237,18 @@ function draw() {
         ctx.globalAlpha = 1;
     });
 
-    // Boss + bananes
     drawBoss();
 }
+
 // ===============================
-//  EXPLOSIONS NÉON
+//  EXPLOSIONS
 // ===============================
 
 function createExplosion(x, y) {
     for (let i = 0; i < 12; i++) {
         explosions.push({
-            x: x,
-            y: y,
+            x,
+            y,
             size: Math.random() * 6 + 3,
             speedX: (Math.random() - 0.5) * 4,
             speedY: (Math.random() - 0.5) * 4,
@@ -266,7 +259,7 @@ function createExplosion(x, y) {
 }
 
 // ===============================
-//  BOSS SINGE COSMIQUE 🐒
+//  BOSS
 // ===============================
 
 function spawnBoss() {
@@ -283,7 +276,6 @@ function spawnBoss() {
     };
 }
 
-// Attaques du boss (bananes)
 function bossAttack() {
     if (!bossActive || !boss) return;
 
@@ -298,25 +290,16 @@ function bossAttack() {
     });
 }
 
-// Le boss lance une banane toutes les 900 ms
 setInterval(() => {
     if (bossActive) bossAttack();
 }, 900);
 
-// ===============================
-//  MISE À JOUR DU BOSS
-// ===============================
-
 function updateBoss() {
     if (!bossActive || !boss) return;
 
-    // Déplacement horizontal du boss
     boss.x += boss.speedX;
-    if (boss.x <= 0 || boss.x + boss.width >= canvas.width) {
-        boss.speedX *= -1;
-    }
+    if (boss.x <= 0 || boss.x + boss.width >= canvas.width) boss.speedX *= -1;
 
-    // Déplacement des bananes
     bananas.forEach(b => {
         b.y += b.speedY;
         b.x += b.angle;
@@ -343,22 +326,15 @@ function updateBoss() {
         }
     });
 
-    // Supprimer les bananes hors écran
     bananas = bananas.filter(b => b.y < canvas.height + 50);
 }
 
-// ===============================
-//  DESSIN DU BOSS ET DES BANANES
-// ===============================
-
 function drawBoss() {
     if (bossActive && boss) {
-        // Boss (emoji géant)
         ctx.font = "90px Arial";
         ctx.textAlign = "center";
         ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 10);
 
-        // Barre de vie
         ctx.fillStyle = "#ff0054";
         ctx.fillRect(boss.x, boss.y - 15, boss.width, 10);
 
@@ -366,14 +342,14 @@ function drawBoss() {
         ctx.fillRect(boss.x, boss.y - 15, (bossHP / 50) * boss.width, 10);
     }
 
-    // Bananes
     bananas.forEach(b => {
         ctx.font = "30px Arial";
         ctx.fillText(b.emoji, b.x, b.y);
     });
 }
+
 // ===============================
-//  EASTER EGG BONOBOS + LEADERBOARD + ENDLESS
+//  BONOBOS + LEADERBOARD + ENDLESS
 // ===============================
 
 function triggerBonoboEasterEgg() {
@@ -404,9 +380,8 @@ function saveScore(name, score) {
 
 function showLeaderboard() {
     const box = document.getElementById("leaderboard");
-    if (!box) return;
-
     box.innerHTML = "<h3>Leaderboard</h3>";
+
     leaderboard.forEach((entry, i) => {
         box.innerHTML += `<p>${i + 1}. ${entry.name} — ${entry.score} pts</p>`;
     });
@@ -414,7 +389,6 @@ function showLeaderboard() {
 
 function showEndlessButton() {
     const box = document.getElementById("endless-btn-box");
-    if (!box) return;
 
     box.innerHTML = `
         <button id="endless-btn" class="btn" style="margin-top:20px;">
