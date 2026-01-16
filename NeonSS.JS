@@ -30,6 +30,8 @@ let boss = null;
 let bossActive = false; 
 let bossHP = 50; 
 let bananas = [];
+let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+
 
 // ===============================
 //  LANCEMENT DU JEU
@@ -338,3 +340,24 @@ function triggerBonoboEasterEgg() {
     bonoboMessage.style.display = "block";
     bonoboMessage.style.animation = "fadeIn 2s ease forwards";
 }
+
+function saveScore(name, score) {
+    leaderboard.push({ name, score });
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, 10); // Top 10
+
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+}
+function showLeaderboard() {
+    const box = document.getElementById("leaderboard");
+    box.innerHTML = "<h3>Leaderboard</h3>";
+
+    leaderboard.forEach((entry, i) => {
+        box.innerHTML += `<p>${i+1}. ${entry.name} — ${entry.score} pts</p>`;
+    });
+}
+let name = prompt("Entre ton pseudo pour le leaderboard :");
+if (!name) name = "Anonyme";
+
+saveScore(name, score);
+showLeaderboard();
