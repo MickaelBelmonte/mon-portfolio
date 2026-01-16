@@ -26,6 +26,8 @@ let score = 0;
 let timeElapsed = 0;
 let gameInterval = null;
 let enemySpawnInterval = null;
+let lives = 3;
+
 
 // Entités
 let enemies = [];
@@ -65,6 +67,9 @@ function startGame() {
     boss = null;
     bossActive = false;
     bossHP = 50;
+    lives = 3;
+    updateLivesDisplay();
+    player.shots = 0;
 
     // Nettoyage des intervalles
     if (gameInterval) clearInterval(gameInterval);
@@ -119,7 +124,7 @@ const player = {
     y: canvas.height - 80,
     width: 40,
     height: 40,
-    speed: 6,
+    speed: 10,
     color: "#4cc9f0",
     bullets: []
 };
@@ -139,8 +144,22 @@ document.addEventListener("keydown", e => {
             height: 15,
             speed: 8
         });
+
+        player.shots++; // ← compteur de tirs
     }
 });
+
+
+function loseLife() {
+    lives--;
+
+    if (lives <= 0) {
+        gameOver();
+    }
+}
+const livesDisplay = document.getElementById("lives");
+
+shots: 0
 
 // ===============================
 //  ENNEMIS
@@ -202,7 +221,86 @@ function update() {
     });
 
     updateBoss();
+    
+// Collision banane / joueur
+bananas.forEach((b, bi) => {
+    if (
+        b.x < player.x + player.width &&
+        b.x + b.width > player.x &&
+        b.y < player.y + player.height &&
+        b.y + b.height > player.y
+    ) {
+        bananas.splice(bi, 1);
+        loseLife();
+    }
+});
+
+    if (enemy.y > canvas.height) {
+    enemies.splice(ei, 1);
+    loseLife();
 }
+
+    bananas.forEach((b, bi) => {
+    if (
+        b.x < player.x + player.width &&
+        b.x + b.width > player.x &&
+        b.y < player.y + player.height &&
+        b.y + b.height > player.y
+    ) {
+        bananas.splice(bi, 1);
+        loseLife();
+    }
+});
+
+    
+}
+
+// Si un ennemi sort de l'écran → perdre une vie
+enemies.forEach((enemy, ei) => {
+    if (enemy.y > canvas.height) {
+        enemies.splice(ei, 1);
+        loseLife();
+    }
+});
+
+function gameOver() {
+    gameRunning = false;
+    clearInterval(gameInterval);
+    clearInterval(enemySpawnInterval);
+
+    let name = prompt("Game Over ! Entre ton pseudo pour le leaderboard :");
+    if (!name) name = "Anonyme";
+
+    saveScore(name, score);
+    showLeaderboard();
+    showEndlessButton();
+
+    // Affiche un message Game Over
+    bonoboMessage.style.display = "block";
+    bonoboMessage.innerHTML = `
+        <h2>GAME OVER</h2>
+        <p>Dommage ! Retente ta chance !</p>
+    `;
+}
+
+function updateLivesDisplay() {
+    let hearts = "";
+    for (let i = 0; i < lives; i++) {
+        hearts += "❤️";
+    }
+    livesDisplay.textContent = "Vies : " + hearts;
+}
+
+function loseLife() {
+    lives--;
+    updateLivesDisplay();
+
+    if (lives <= 0) {
+        gameOver();
+    }
+}
+
+
 
 // ===============================
 //  DRAW
@@ -368,18 +466,34 @@ function triggerBonoboEasterEgg() {
 }
 
 function saveScore(name, score) {
-    leaderboard.push({ name, score });
+    function saveScore(name, score) {
+    const shots = player.shots;
+    const ratio = shots > 0 ? (score / shots).toFixed(2) : score;
+
+    leaderboard.push({ name, score, shots, ratio });
+
     leaderboard.sort((a, b) => b.score - a.score);
     leaderboard = leaderboard.slice(0, 10);
+
     localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
 }
+
 
 function showLeaderboard() {
     const box = document.getElementById("leaderboard");
     box.innerHTML = "<h3>Leaderboard</h3>";
 
     leaderboard.forEach((entry, i) => {
-        box.innerHTML += `<p>${i + 1}. ${entry.name} — ${entry.score} pts</p>`;
+        
+box.innerHTML += `
+    <p>
+        ${i + 1}. ${entry.name} — 
+        ${entry.score} pts — 
+        ${entry.shots} tirs — 
+        Ratio : ${entry.ratio}
+    </p>
+`;
+
     });
 }
 
