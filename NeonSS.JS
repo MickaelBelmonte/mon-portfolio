@@ -1,6 +1,6 @@
 // ===============================
-//  NEON SPACE SHOOTER - PARTIE 1
-//  Menu + Lancement + Timer + Score
+//  NEON SPACE SHOOTER
+//  Base + Menu + Timer + Score
 // ===============================
 
 // Canvas du jeu
@@ -17,45 +17,86 @@ const hud = document.getElementById("hud");
 const scoreDisplay = document.getElementById("score");
 const timerDisplay = document.getElementById("timer");
 
-// Easter Egg (sera utilisé plus tard)
+// Easter Egg
 const bonoboMessage = document.getElementById("bonobo-message");
+
+// Leaderboard + Endless
+let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+let isEndless = false;
 
 // Variables globales
 let gameRunning = false;
 let score = 0;
 let timeElapsed = 0;
 let gameInterval = null;
-let explosions = [] 
-let boss = null; 
-let bossActive = false; 
-let bossHP = 50; 
-let bananas = [];
-let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+let enemySpawnInterval = null;
 
+// Entités
+let enemies = [];
+let explosions = [];
+let bananas = [];
+
+// Boss
+let boss = null;
+let bossActive = false;
+let bossHP = 50;
 
 // ===============================
 //  LANCEMENT DU JEU
 // ===============================
 
 startBtn.addEventListener("click", () => {
-    menu.style.display = "none";   // Cache le menu
-    hud.style.display = "flex";    // Affiche le HUD
+    isEndless = false;
     startGame();
 });
 
 function startGame() {
+    // Reset UI
+    menu.style.display = "none";
+    hud.style.display = "flex";
+    bonoboMessage.style.display = "none";
+    const leaderboardBox = document.getElementById("leaderboard");
+    const endlessBox = document.getElementById("endless-btn-box");
+    if (leaderboardBox) leaderboardBox.innerHTML = "";
+    if (endlessBox) endlessBox.innerHTML = "";
+
+    // Reset état
     gameRunning = true;
     score = 0;
     timeElapsed = 0;
+    enemies = [];
+    explosions = [];
+    bananas = [];
+    boss = null;
+    bossActive = false;
+    bossHP = 50;
 
-    // Mise à jour du score et du timer toutes les secondes
+    // Nettoyage des intervalles
+    if (gameInterval) clearInterval(gameInterval);
+    if (enemySpawnInterval) clearInterval(enemySpawnInterval);
+
+    // Timer
     gameInterval = setInterval(() => {
         timeElapsed++;
         timerDisplay.textContent = "Temps : " + timeElapsed + "s";
 
-       if (timeElapsed === 120 && !bossActive) { spawnBoss(); }
-
+        // Apparition du boss après 120s en mode normal uniquement
+        if (!isEndless && timeElapsed === 120 && !bossActive) {
+            spawnBoss();
+        }
     }, 1000);
+
+    // Spawn des ennemis
+    const spawnDelay = isEndless ? 700 : 900;
+    enemySpawnInterval = setInterval(() => {
+        if (gameRunning && !bossActive) {
+            spawnEnemy();
+            if (isEndless) {
+                // Double spawn en Endless
+                spawnEnemy();
+            }
+        }
+    }, spawnDelay);
 
     // Lancement de la boucle du jeu
     requestAnimationFrame(gameLoop);
@@ -68,14 +109,15 @@ function startGame() {
 function gameLoop() {
     if (!gameRunning) return;
 
-    // Efface l'écran
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // (Les ennemis, tirs, explosions, boss viendront dans les parties suivantes)
+    update();
+    draw();
 
-    // Affiche le score
-    scoreDisplay.textContent = "
+    scoreDisplay.textContent = "Score : " + score;
 
+    requestAnimationFrame(gameLoop);
+}
 // ===============================
 //  JOUEUR
 // ===============================
@@ -112,7 +154,6 @@ document.addEventListener("keydown", e => {
 //  ENNEMIS
 // ===============================
 
-let enemies = [];
 let enemySpeed = 2;
 
 function spawnEnemy() {
@@ -125,17 +166,11 @@ function spawnEnemy() {
     });
 }
 
-// Un ennemi toutes les 900 ms
-setInterval(() => {
-    if (gameRunning) spawnEnemy();
-}, 900);
-
 // ===============================
 //  MISE À JOUR DU JEU
 // ===============================
 
 function update() {
-
     // Déplacement du joueur
     if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
     if (keys["ArrowRight"] && player.x < canvas.width - player.width) player.x += player.speed;
@@ -156,12 +191,9 @@ function update() {
                 bullet.y < enemy.y + enemy.height &&
                 bullet.y + bullet.height > enemy.y
             ) {
-                // Explosion + score
-                score += 10;
-
-                createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2); 
-
-                enemies.splice(ei, 1); 
+                score += isEndless ? 20 : 10;
+                createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2);
+                enemies.splice(ei, 1);
                 player.bullets.splice(bi, 1);
             }
         });
@@ -169,6 +201,17 @@ function update() {
 
     // Supprimer les ennemis hors écran
     enemies = enemies.filter(e => e.y < canvas.height + 50);
+
+    // Mise à jour des explosions
+    explosions.forEach((p, i) => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.alpha -= 0.03;
+        if (p.alpha <= 0) explosions.splice(i, 1);
+    });
+
+    // Mise à jour du boss et des bananes
+    updateBoss();
 }
 
 // ===============================
@@ -176,7 +219,6 @@ function update() {
 // ===============================
 
 function draw() {
-
     // Joueur
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
@@ -190,11 +232,23 @@ function draw() {
         ctx.fillStyle = e.color;
         ctx.fillRect(e.x, e.y, e.width, e.height);
     });
-}
 
-  // ==============================
-  // EXPLOSION
-  // ==============================
+    // Explosions
+    explosions.forEach(p => {
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    });
+
+    // Boss + bananes
+    drawBoss();
+}
+// ===============================
+//  EXPLOSIONS NÉON
+// ===============================
 
 function createExplosion(x, y) {
     for (let i = 0; i < 12; i++) {
@@ -210,29 +264,13 @@ function createExplosion(x, y) {
     }
 }
 
-// Mise à jour des explosions
-explosions.forEach((p, i) => {
-    p.x += p.speedX;
-    p.y += p.speedY;
-    p.alpha -= 0.03;
-
-    if (p.alpha <= 0) {
-        explosions.splice(i, 1);
-    }
-});
-
-// Dessin des explosions
-explosions.forEach(p => {
-    ctx.globalAlpha = p.alpha;
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-});
+// ===============================
+//  BOSS SINGE COSMIQUE 🐒
+// ===============================
 
 function spawnBoss() {
     bossActive = true;
+    bossHP = 50;
 
     boss = {
         x: canvas.width / 2 - 60,
@@ -244,8 +282,9 @@ function spawnBoss() {
     };
 }
 
+// Attaques du boss (bananes)
 function bossAttack() {
-    if (!bossActive) return;
+    if (!bossActive || !boss) return;
 
     bananas.push({
         x: boss.x + boss.width / 2,
@@ -254,7 +293,7 @@ function bossAttack() {
         height: 20,
         emoji: "🍌",
         speedY: 4,
-        angle: (Math.random() - 0.5) * 2 // zigzag
+        angle: (Math.random() - 0.5) * 2
     });
 }
 
@@ -266,7 +305,9 @@ setInterval(() => {
 // ===============================
 //  MISE À JOUR DU BOSS
 // ===============================
-if (bossActive && boss) {
+
+function updateBoss() {
+    if (!bossActive || !boss) return;
 
     // Déplacement horizontal du boss
     boss.x += boss.speedX;
@@ -290,10 +331,8 @@ if (bossActive && boss) {
         ) {
             bossHP--;
             player.bullets.splice(bi, 1);
-
             createExplosion(bullet.x, bullet.y);
 
-            // Boss vaincu
             if (bossHP <= 0) {
                 bossActive = false;
                 boss = null;
@@ -308,34 +347,38 @@ if (bossActive && boss) {
 }
 
 // ===============================
-//  DESSIN DU BOSS
+//  DESSIN DU BOSS ET DES BANANES
 // ===============================
-if (bossActive && boss) {
 
-    // Boss (emoji géant)
-    ctx.font = "90px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 10);
+function drawBoss() {
+    if (bossActive && boss) {
+        // Boss (emoji géant)
+        ctx.font = "90px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 10);
 
-    // Barre de vie du boss
-    ctx.fillStyle = "#ff0054";
-    ctx.fillRect(boss.x, boss.y - 15, boss.width, 10);
+        // Barre de vie
+        ctx.fillStyle = "#ff0054";
+        ctx.fillRect(boss.x, boss.y - 15, boss.width, 10);
 
-    ctx.fillStyle = "#4cc9f0";
-    ctx.fillRect(boss.x, boss.y - 15, (bossHP / 50) * boss.width, 10);
+        ctx.fillStyle = "#4cc9f0";
+        ctx.fillRect(boss.x, boss.y - 15, (bossHP / 50) * boss.width, 10);
+    }
+
+    // Bananes
+    bananas.forEach(b => {
+        ctx.font = "30px Arial";
+        ctx.fillText(b.emoji, b.x, b.y);
+    });
 }
-
 // ===============================
-//  DESSIN DES BANANES 🍌
+//  EASTER EGG BONOBOS + LEADERBOARD + ENDLESS
 // ===============================
-bananas.forEach(b => {
-    ctx.font = "30px Arial";
-    ctx.fillText(b.emoji, b.x, b.y);
-});
 
 function triggerBonoboEasterEgg() {
     gameRunning = false;
     clearInterval(gameInterval);
+    clearInterval(enemySpawnInterval);
 
     bonoboMessage.style.display = "block";
     bonoboMessage.innerHTML = `
@@ -343,28 +386,34 @@ function triggerBonoboEasterEgg() {
         <p>Tu as vaincu le Singe Cosmique.</p>
     `;
 
-    // Leaderboard
     let name = prompt("Entre ton pseudo pour le leaderboard :");
     if (!name) name = "Anonyme";
 
     saveScore(name, score);
     showLeaderboard();
-
-    // Bouton Mode Endless
     showEndlessButton();
-}
-
 }
 
 function saveScore(name, score) {
     leaderboard.push({ name, score });
     leaderboard.sort((a, b) => b.score - a.score);
-    leaderboard = leaderboard.slice(0, 10); // Top 10
+    leaderboard = leaderboard.slice(0, 10);
     localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+}
+
+function showLeaderboard() {
+    const box = document.getElementById("leaderboard");
+    if (!box) return;
+
+    box.innerHTML = "<h3>Leaderboard</h3>";
+    leaderboard.forEach((entry, i) => {
+        box.innerHTML += `<p>${i + 1}. ${entry.name} — ${entry.score} pts</p>`;
+    });
 }
 
 function showEndlessButton() {
     const box = document.getElementById("endless-btn-box");
+    if (!box) return;
 
     box.innerHTML = `
         <button id="endless-btn" class="btn" style="margin-top:20px;">
@@ -377,54 +426,7 @@ function showEndlessButton() {
     });
 }
 
-
-}
-function showLeaderboard() {
-    const box = document.getElementById("leaderboard");
-    box.innerHTML = "<h3>Leaderboard</h3>";
-
-    leaderboard.forEach((entry, i) => {
-        box.innerHTML += `<p>${i+1}. ${entry.name} — ${entry.score} pts</p>`;
-    });
-}
-let name = prompt("Entre ton pseudo pour le leaderboard :");
-if (!name) name = "Anonyme";
-
-saveScore(name, score);
-showLeaderboard();
-
 function startEndlessMode() {
-    // Reset minimal
-    bonoboMessage.style.display = "none";
-    document.getElementById("leaderboard").innerHTML = "";
-    document.getElementById("endless-btn-box").innerHTML = "";
-
-    enemies = [];
-    player.bullets = [];
-    bananas = [];
-    bossActive = false;
-    boss = null;
-
-    enemySpeed = 3; // un peu plus rapide
-    score = 0;
-    timeElapsed = 0;
-
-    gameRunning = true;
-
-    // Spawn plus rapide
-    endlessSpawn = setInterval(() => {
-        if (gameRunning) {
-            spawnEnemy();
-            spawnEnemy(); // double spawn
-        }
-    }, 700);
-
-    // Timer
-    gameInterval = setInterval(() => {
-        timeElapsed++;
-        timerDisplay.textContent = "Temps : " + timeElapsed + "s";
-    }, 1000);
-
-    requestAnimationFrame(gameLoop);
+    isEndless = true;
+    startGame();
 }
-
