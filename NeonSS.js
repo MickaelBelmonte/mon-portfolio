@@ -208,12 +208,18 @@ enemies.forEach((enemy, ei) => {
             bullet.y + bullet.size > enemy.y
         ) {
             score += isEndless ? 20 : 10;
-            createExplosion(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2);
+
+            createExplosion(
+                enemy.x + enemy.size / 2,
+                enemy.y + enemy.size / 2
+            );
+
             enemies.splice(ei, 1);
             player.bullets.splice(bi, 1);
         }
     });
 });
+
 
 // Supprimer les ennemis sortis de l'écran
 enemies = enemies.filter(e => e.y < canvas.height + 50);
@@ -241,10 +247,6 @@ bananas.forEach((b, bi) => {
     }
 });
 
-// (SUPPRIMÉ) ❌ Ce bloc était illégal
-// if (enemy.y > canvas.height) { ... }
-
-// Collision banane / joueur (doublon supprimable si tu veux)
 bananas.forEach((b, bi) => {
     if (
         b.x < player.x + player.width &&
