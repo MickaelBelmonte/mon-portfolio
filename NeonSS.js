@@ -126,7 +126,7 @@ const player = {
     height: 40,
     speed: 10,
     color: "#4cc9f0",
-    bullets: [🧤]
+    bullets: []
 };
 
 let keys = {};
@@ -137,13 +137,14 @@ document.addEventListener("keyup", e => keys[e.key] = false);
 // Tir
 document.addEventListener("keydown", e => {
     if (e.key === " " && gameRunning) {
-        player.bullets.push({
-            x: player.x + player.width / 2 - 3,
-            y: player.y,
-            width: 6,
-            height: 15,
-            speed: 8
-        });
+player.bullets.push({
+    x: player.x + player.width / 2 - 10,
+    y: player.y,
+    emoji: "🧤",
+    size: 30,   // taille de l’emoji
+    speed: 10
+});
+
 
         player.shots++; // ← compteur de tirs
     }
@@ -193,8 +194,8 @@ function update() {
     if (keys["ArrowRight"] && player.x < canvas.width - player.width) player.x += player.speed;
 
     // Tirs
-    player.bullets.forEach(b => b.y -= b.speed);
-    player.bullets = player.bullets.filter(b => b.y > -20);
+player.bullets.forEach(b => b.y -= b.speed);
+player.bullets = player.bullets.filter(b => b.y > -50);
 
     // Ennemis
 enemies.forEach(e => e.y += e.speed);
@@ -205,9 +206,9 @@ enemies.forEach(e => e.y += e.speed);
         player.bullets.forEach((bullet, bi) => {
             if (
            bullet.x < enemy.x + e.size &&
-           bullet.x + bullet.width > enemy.x &&
+           bullet.x + bullet.size > enemy.x &&
            bullet.y < enemy.y + e.size &&
-           bullet.y + bullet.height > enemy.y
+           bullet.y + bullet.size > enemy.y
                 
             ) {
                 score += isEndless ? 20 : 10;
@@ -320,8 +321,11 @@ function draw() {
     ctx.fillRect(player.x, player.y, player.width, player.height);
 
     // Tirs
-    ctx.fillStyle = "#4cc9f0";
-    player.bullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+player.bullets.forEach(b => {
+    ctx.font = b.size + "px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(b.emoji, b.x, b.y);
+});
 
     // Ennemis
     enemies.forEach(e => {
@@ -414,9 +418,9 @@ function updateBoss() {
     player.bullets.forEach((bullet, bi) => {
         if (
             bullet.x < boss.x + boss.width &&
-            bullet.x + bullet.width > boss.x &&
+            bullet.x + bullet.size > boss.x &&
             bullet.y < boss.y + boss.height &&
-            bullet.y + bullet.height > boss.y
+            bullet.y + bullet.size > boss.y
         ) {
             bossHP--;
             player.bullets.splice(bi, 1);
