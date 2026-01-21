@@ -34,11 +34,9 @@ async function fetchLeaderboard() {
         });
         const data = await res.json();
 
-        // Structure attendue : { record: { leaderboard: [...] } }
         if (data && data.record && Array.isArray(data.record.leaderboard)) {
             return data.record.leaderboard;
         }
-
         return [];
     } catch (err) {
         console.error("Erreur récupération leaderboard :", err);
@@ -60,6 +58,15 @@ async function saveLeaderboard(leaderboardArray) {
     } catch (err) {
         console.error("Erreur sauvegarde leaderboard :", err);
     }
+}
+
+// ===============================
+//  BADGES
+// ===============================
+function getBadge(ratio) {
+    if (ratio < 1) return "🙈 Spam Monkey";
+    if (ratio > 8) return "🎯 Sniper";
+    return "";
 }
 
 // ===============================
@@ -446,9 +453,10 @@ async function triggerBonoboEasterEgg() {
 async function saveScore(name, score) {
     const shots = player.shots;
     const ratio = shots > 0 ? (score / shots).toFixed(2) : score;
+    const badge = getBadge(ratio);
 
     let leaderboard = await fetchLeaderboard();
-    leaderboard.push({ name, score, shots, ratio });
+    leaderboard.push({ name, score, shots, ratio, badge });
 
     leaderboard.sort((a, b) => b.score - a.score);
     leaderboard = leaderboard.slice(0, 10);
@@ -464,10 +472,11 @@ async function showLeaderboard() {
     leaderboard.forEach((entry, i) => {
         leaderboardBox.innerHTML += `
             <p>
-                ${i + 1}. ${entry.name} — 
-                ${entry.score} pts — 
-                ${entry.shots} tirs — 
+                ${i + 1}. ${entry.name} —
+                ${entry.score} pts —
+                ${entry.shots} tirs —
                 Ratio : ${entry.ratio}
+                ${entry.badge ? "— " + entry.badge : ""}
             </p>
         `;
     });
