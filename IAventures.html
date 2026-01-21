@@ -2,49 +2,75 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>L'IAventures !</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'IAventures – Portfolio de Mickael Belmonte</title>
+
+    <!-- Polices IA -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS global -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+    <!-- CURSEUR IA -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-halo"></div>
+
+    <!-- PARTICULES -->
     <canvas id="particles"></canvas>
 
+    <!-- NAVBAR -->
     <header>
         <nav class="navbar">
             <h1 class="logo">Mini IA Aventures</h1>
+
             <ul class="nav-links">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="projects.html">Projets</a></li>
             </ul>
+
             <button id="theme-toggle" class="theme-btn">🌙</button>
         </nav>
     </header>
 
-    <main style="padding: 20px; max-width: 900px; margin: auto;">
-        <h2 class="neon">Bienvenue sur mon IAventures !</h2>
+    <!-- CONTENU -->
+    <main>
+        <section class="fade-in" style="max-width: 900px; margin: auto;">
 
-        <p style="opacity: 0.8;">
-            Un générateur d'aventure comme le ferait une "IA" très basique avec quelques bases.
-        </p>
+            <h2 class="neon">Bienvenue sur mon IAventures !</h2>
 
-        <div style="margin: 20px 0;">
-            <button class="btn" onclick="genererAventure()">Aventure aléatoire</button>
-            <button class="btn" onclick="exploration()">Exploration</button>
-            <button class="btn" onclick="creationMonde()">Créer un monde</button>
-            <button class="btn" onclick="genererCreature()">Créer une créature</button>
-            <button class="btn" onclick="genererCarte()">Carte ASCII</button>
-            <button class="btn" onclick="genererHistoire()">Histoire complète</button>
-        </div>
+            <p class="fade-in" style="opacity: 0.85;">
+                Un générateur d'aventure comme le ferait une "IA" très basique avec quelques bases.
+            </p>
 
-        <pre id="output" class="output-box"></pre>
+            <!-- Boutons -->
+            <div class="fade-in" style="margin: 20px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+                <button class="btn" onclick="genererAventure()">Aventure aléatoire</button>
+                <button class="btn" onclick="exploration()">Exploration</button>
+                <button class="btn" onclick="creationMonde()">Créer un monde</button>
+                <button class="btn" onclick="genererCreature()">Créer une créature</button>
+                <button class="btn" onclick="genererCarte()">Carte ASCII</button>
+                <button class="btn" onclick="genererHistoire()">Histoire complète</button>
+            </div>
+
+            <!-- Zone de sortie -->
+            <pre id="output" class="output-box fade-in"></pre>
+
+        </section>
     </main>
 
+    <!-- FOOTER -->
     <footer>
-        <p>© 2026 - MICKAEL BELMONTE</p>
+        <p class="signature">© 2026 — MICKAEL BELMONTE</p>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="particles.js"></script>
     <script src="script.js"></script>
     <script src="iAventures.js"></script>
+
 </body>
 </html>
+
