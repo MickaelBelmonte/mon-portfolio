@@ -2,61 +2,88 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Neon Space Shooter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Space Shooter – Portfolio de Mickael Belmonte</title>
+
+    <!-- Polices IA -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS global + CSS du jeu -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="NeonSS.css">
 </head>
 
 <body>
+
+    <!-- CURSEUR IA -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-halo"></div>
+
+    <!-- PARTICULES -->
     <canvas id="particles"></canvas>
 
+    <!-- NAVBAR -->
     <header>
         <nav class="navbar">
             <h1 class="logo">Neon Space Shooter</h1>
+
             <ul class="nav-links">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="projects.html">Projets</a></li>
                 <li><a href="about.html">À propos</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+
             <button id="theme-toggle" class="theme-btn">🌙</button>
         </nav>
     </header>
 
-    <main class="neonss-main">
-        <div id="game-menu" class="game-menu">
+    <!-- CONTENU -->
+    <main class="neonss-main fade-in">
+
+        <!-- Menu du jeu -->
+        <div id="game-menu" class="game-menu fade-in">
             <h2 class="game-title neon">Neon Space Shooter</h2>
             <p class="game-subtitle">Déplace-toi, tire, survie... et affronte le Singe Cosmique.</p>
             <button id="start-btn" class="btn game-btn">Jouer</button>
         </div>
 
-        <div class="game-wrapper">
+        <!-- Canvas du jeu -->
+        <div class="game-wrapper fade-in">
             <canvas id="gameCanvas"></canvas>
+
             <div id="hud" class="hud">
                 <span id="score">Score : 0</span>
                 <span id="timer">Temps : 0s</span>
             </div>
         </div>
 
-        <div id="bonobo-message" class="bonobo-message">
+        <!-- Message de victoire -->
+        <div id="bonobo-message" class="bonobo-message fade-in">
             <h2>Bienvenue dans le Royaume des Bonobos</h2>
             <p>Tu as vaincu le Singe Cosmique.</p>
         </div>
 
-        <div id="leaderboard" class="leaderboard"></div>
-        <div id="endless-btn-box"></div>
+        <!-- Leaderboard -->
+        <div id="leaderboard" class="leaderboard fade-in"></div>
 
-        <div id="lives">Vies : ❤️❤️❤️</div>
+        <!-- Mode Endless -->
+        <div id="endless-btn-box" class="fade-in"></div>
+
+        <!-- Vies -->
+        <div id="lives" class="fade-in">Vies : ❤️❤️❤️</div>
 
     </main>
 
+    <!-- FOOTER -->
     <footer>
-        <p>© 2026 - MICKAEL BELMONTE</p>
+        <p class="signature">© 2026 — MICKAEL BELMONTE</p>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="particles.js"></script>
     <script src="script.js"></script>
     <script src="NeonSS.js"></script>
+
 </body>
 </html>
-
