@@ -4,39 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio de Mickael Belmonte</title>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- Polices IA -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Style principal -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+    <!-- Particules IA -->
     <canvas id="particles"></canvas>
 
+    <!-- NAVBAR -->
     <header>
         <nav class="navbar">
             <h1 class="logo">Mon Portfolio</h1>
+
             <ul class="nav-links">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="projects.html">Projets</a></li>
                 <li><a href="about.html">À propos</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+
+            <!-- Bouton thème -->
             <button id="theme-toggle" class="theme-btn">🌙</button>
         </nav>
     </header>
 
+    <!-- HERO -->
     <main>
-        <section class="hero">
-            <h2>Bienvenue sur mon portfolio</h2>
+        <section class="hero fade-in">
+            <h2>Bienvenue sur <span>mon portfolio</span></h2>
             <p>A la recherche d'une alternance en Bachelor Informatique, ce site a pour but de servir comme Portfolio.</p>
             <a class="btn" href="projects.html">Voir mes projets</a>
         </section>
     </main>
 
+    <!-- FOOTER -->
     <footer>
-        <p>© 2026 - MICKAEL BELMONTE</p>
+        <p class="signature">© 2026 — MICKAEL BELMONTE</p>
     </footer>
 
+    <!-- Scripts -->
     <script src="particles.js"></script>
-    <script src="script.js"></script>
+
+    <script>
+        /* Mode clair / sombre */
+        document.getElementById("theme-toggle").addEventListener("click", () => {
+            document.body.classList.toggle("light-mode");
+        });
+
+        /* Animation fade-in */
+        const elements = document.querySelectorAll('.fade-in');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('appear');
+                }
+            });
+        });
+
+        elements.forEach(el => observer.observe(el));
+    </script>
+
 </body>
 </html>
+
