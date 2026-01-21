@@ -53,7 +53,7 @@ html {
 }
 
 body {
-    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Inter", "Orbitron", sans-serif;
     background: radial-gradient(circle at top, #0b1020 0, #020308 55%, #000 100%);
     color: var(--text);
     line-height: 1.7;
