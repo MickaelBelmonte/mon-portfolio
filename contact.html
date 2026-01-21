@@ -2,41 +2,70 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Contact - Mon Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact – Portfolio de Mickael Belmonte</title>
+
+    <!-- Polices IA -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+    <!-- CURSEUR IA -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-halo"></div>
+
+    <!-- PARTICULES -->
     <canvas id="particles"></canvas>
 
+    <!-- NAVBAR -->
     <header>
         <nav class="navbar">
             <h1 class="logo">Mon Portfolio</h1>
+
             <ul class="nav-links">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="projects.html">Projets</a></li>
                 <li><a href="about.html">À propos</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+
             <button id="theme-toggle" class="theme-btn">🌙</button>
         </nav>
     </header>
 
-    <main style="padding: 20px;">
-        <h2>Contact</h2>
-        <p>Email : belmonte.mickael@gmail.com</p>
-        <p>LinkedIn : 
-            <a href="https://fr.linkedin.com/in/micka%C3%ABl-belmonte-04051414a" target="_blank">
-                MICKAEL BELMONTE
-            </a>
-        </p>
+    <!-- CONTENU -->
+    <main>
+        <section class="fade-in">
+            <h2 class="neon">Contact</h2>
+
+            <p>Email :</p>
+            <p>
+                <a href="mailto:belmonte.mickael@gmail.com" class="btn">
+                    belmonte.mickael@gmail.com
+                </a>
+            </p>
+
+            <p style="margin-top: 20px;">LinkedIn :</p>
+            <p>
+                <a href="https://fr.linkedin.com/in/micka%C3%ABl-belmonte-04051414a" target="_blank" class="btn">
+                    MICKAEL BELMONTE
+                </a>
+            </p>
+        </section>
     </main>
 
+    <!-- FOOTER -->
     <footer>
-        <p>© 2026 - MICKAEL BELMONTE</p>
+        <p class="signature">© 2026 — MICKAEL BELMONTE</p>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="particles.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>
