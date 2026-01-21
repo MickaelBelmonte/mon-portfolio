@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Space Shooter – Portfolio de Mickael Belmonte</title>
 
-    <!-- Polices IA -->
+    <!-- Polices -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 
     <!-- CSS global + CSS du jeu -->
@@ -34,7 +34,7 @@
                 <li><a href="contact.html">Contact</a></li>
             </ul>
 
-            <button id="theme-toggle" class="theme-btn">🌙</button>
+            <button id="theme-toggle" class="theme-btn" aria-label="Changer le thème">🌙</button>
         </nav>
     </header>
 
@@ -80,10 +80,10 @@
         <p class="signature">© 2026 — MICKAEL BELMONTE</p>
     </footer>
 
-    <!-- SCRIPTS -->
-    <script src="particles.js"></script>
-    <script src="script.js"></script>
-    <script src="NeonSS.js"></script>
+    <!-- SCRIPTS (avec defer pour éviter les bugs DOM) -->
+    <script src="particles.js" defer></script>
+    <script src="script.js" defer></script>
+    <script src="NeonSS.js" defer></script>
 
 </body>
 </html>
