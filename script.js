@@ -75,3 +75,31 @@ const appearOnScroll = new IntersectionObserver((entries, observer) => {
 fadeElements.forEach(el => {
     appearOnScroll.observe(el);
 });
+
+/* CURSEUR IA HOLOGRAPHIQUE */
+
+const cursorDot = document.querySelector(".cursor-dot");
+const cursorHalo = document.querySelector(".cursor-halo");
+
+let mouseX = 0, mouseY = 0;
+let haloX = 0, haloY = 0;
+
+document.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    cursorDot.style.left = mouseX + "px";
+    cursorDot.style.top = mouseY + "px";
+});
+
+/* Animation du halo avec un léger retard */
+function animateHalo() {
+    haloX += (mouseX - haloX) * 0.12;
+    haloY += (mouseY - haloY) * 0.12;
+
+    cursorHalo.style.left = haloX + "px";
+    cursorHalo.style.top = haloY + "px";
+
+    requestAnimationFrame(animateHalo);
+}
+animateHalo();
