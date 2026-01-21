@@ -1,4 +1,14 @@
 // ===============================
+//  ÉCRAN DE CHARGEMENT
+// ===============================
+window.addEventListener("load", () => {
+    const loadingScreen = document.getElementById("loading-screen");
+    setTimeout(() => {
+        loadingScreen.classList.add("hidden");
+    }, 2200); // Durée totale du loading
+});
+
+// ===============================
 //  CANVAS
 // ===============================
 const canvas = document.getElementById("gameCanvas");
