@@ -17,10 +17,42 @@ const scoreDisplay = document.getElementById("score");
 const timerDisplay = document.getElementById("timer");
 const bonoboMessage = document.getElementById("bonobo-message");
 const livesDisplay = document.getElementById("lives");
+const leaderboardBox = document.getElementById("leaderboard");
+const endlessBtnBox = document.getElementById("endless-btn-box");
 
-// Leaderboard + Endless
-let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-let isEndless = false;
+// ===============================
+//  LEADERBOARD ONLINE (JSONBIN)
+// ===============================
+const LEADERBOARD_URL = "https://api.jsonbin.io/v3/b/69709cecd0ea881f407a366b";
+const API_KEY = "$2a$10$gCD0Qxxs.NzWK6d1EzrL.emnDKT8Ou2MlGK150480W86zb/qeYtXa";
+
+async function fetchLeaderboard() {
+    try {
+        const res = await fetch(LEADERBOARD_URL, {
+            headers: { "X-Master-Key": API_KEY }
+        });
+        const data = await res.json();
+        return data.record || [];
+    } catch (err) {
+        console.error("Erreur récupération leaderboard :", err);
+        return [];
+    }
+}
+
+async function saveLeaderboard(data) {
+    try {
+        await fetch(LEADERBOARD_URL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Master-Key": API_KEY
+            },
+            body: JSON.stringify(data)
+        });
+    } catch (err) {
+        console.error("Erreur sauvegarde leaderboard :", err);
+    }
+}
 
 // ===============================
 //  VARIABLES GLOBALES
@@ -32,15 +64,15 @@ let gameInterval = null;
 let enemySpawnInterval = null;
 let lives = 3;
 
-// Entités
 let enemies = [];
 let explosions = [];
 let bananas = [];
 
-// Boss
 let boss = null;
 let bossActive = false;
 let bossHP = 50;
+let enemySpeed = 2;
+let isEndless = false;
 
 // ===============================
 //  JOUEUR
@@ -52,14 +84,14 @@ const player = {
     height: 40,
     speed: 10,
     bullets: [],
-    shots: 0
+    shots: 0,
+    color: "#4cc9f0"
 };
 
-let keys = {};
+const keys = {};
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
-// Tir
 document.addEventListener("keydown", e => {
     if (e.key === " " && gameRunning) {
         player.bullets.push({
@@ -74,22 +106,25 @@ document.addEventListener("keydown", e => {
 });
 
 // ===============================
-//  VIES
+//  UTILS
 // ===============================
+function rectsCollide(a, b) {
+    return (
+        a.x < b.x + b.size &&
+        a.x + a.size > b.x &&
+        a.y < b.y + b.size &&
+        a.y + a.size > b.y
+    );
+}
+
 function updateLivesDisplay() {
-    let hearts = "";
-    for (let i = 0; i < lives; i++) {
-        hearts += "❤️";
-    }
-    livesDisplay.textContent = "Vies : " + hearts;
+    livesDisplay.textContent = "Vies : " + "❤️".repeat(lives);
 }
 
 function loseLife() {
     lives--;
     updateLivesDisplay();
-    if (lives <= 0) {
-        gameOver();
-    }
+    if (lives <= 0) gameOver();
 }
 
 // ===============================
@@ -101,15 +136,12 @@ startBtn.addEventListener("click", () => {
 });
 
 function startGame() {
-    // Reset UI
     menu.style.display = "none";
     hud.style.display = "flex";
     bonoboMessage.style.display = "none";
+    leaderboardBox.innerHTML = "";
+    endlessBtnBox.innerHTML = "";
 
-    document.getElementById("leaderboard").innerHTML = "";
-    document.getElementById("endless-btn-box").innerHTML = "";
-
-    // Reset état
     gameRunning = true;
     score = 0;
     timeElapsed = 0;
@@ -120,24 +152,18 @@ function startGame() {
     bossActive = false;
     bossHP = 50;
     lives = 3;
-    updateLivesDisplay();
     player.shots = 0;
+    updateLivesDisplay();
 
-    // Nettoyage des intervalles
     clearInterval(gameInterval);
     clearInterval(enemySpawnInterval);
 
-    // Timer
     gameInterval = setInterval(() => {
         timeElapsed++;
         timerDisplay.textContent = "Temps : " + timeElapsed + "s";
-
-        if (!isEndless && timeElapsed === 120 && !bossActive) {
-            spawnBoss();
-        }
+        if (!isEndless && timeElapsed === 120 && !bossActive) spawnBoss();
     }, 1000);
 
-    // Spawn des ennemis
     const spawnDelay = isEndless ? 700 : 900;
     enemySpawnInterval = setInterval(() => {
         if (gameRunning && !bossActive) {
@@ -146,7 +172,6 @@ function startGame() {
         }
     }, spawnDelay);
 
-    // Lancement du jeu
     requestAnimationFrame(gameLoop);
 }
 
@@ -169,11 +194,8 @@ function gameLoop() {
 // ===============================
 //  ENNEMIS
 // ===============================
-let enemySpeed = 2;
-
 function spawnEnemy() {
     const enemyEmojis = ["🙊", "🙉", "🙈", "🐵"];
-
     enemies.push({
         x: Math.random() * (canvas.width - 80),
         y: -80,
@@ -187,51 +209,36 @@ function spawnEnemy() {
 //  UPDATE
 // ===============================
 function update() {
-    // Déplacement du joueur
     if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
     if (keys["ArrowRight"] && player.x < canvas.width - player.width) player.x += player.speed;
 
-    // Tirs
     player.bullets.forEach(b => b.y -= b.speed);
     player.bullets = player.bullets.filter(b => b.y > -50);
 
-    // Ennemis
     enemies.forEach(e => e.y += e.speed);
 
-    // Si un ennemi sort de l'écran → perdre une vie
-enemies.forEach((enemy, ei) => {
-    if (enemy.y > canvas.height) {
-        enemies.splice(ei, 1);
-        loseLife();
-    }
-});
+    enemies.forEach((enemy, ei) => {
+        if (enemy.y > canvas.height) {
+            enemies.splice(ei, 1);
+            loseLife();
+        }
+    });
 
-    // Collisions tirs / ennemis
     enemies.forEach((enemy, ei) => {
         player.bullets.forEach((bullet, bi) => {
-            if (
-                bullet.x < enemy.x + enemy.size &&
-                bullet.x + bullet.size > enemy.x &&
-                bullet.y < enemy.y + enemy.size &&
-                bullet.y + bullet.size > enemy.y
-            ) {
+            const bulletBox = { x: bullet.x, y: bullet.y, size: bullet.size };
+            const enemyBox = { x: enemy.x, y: enemy.y, size: enemy.size };
+            if (rectsCollide(bulletBox, enemyBox)) {
                 score += isEndless ? 20 : 10;
-
-                createExplosion(
-                    enemy.x + enemy.size / 2,
-                    enemy.y + enemy.size / 2
-                );
-
+                createExplosion(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2);
                 enemies.splice(ei, 1);
                 player.bullets.splice(bi, 1);
             }
         });
     });
 
-    // Supprimer les ennemis sortis de l'écran
     enemies = enemies.filter(e => e.y < canvas.height + 50);
 
-    // Explosions
     explosions.forEach((p, i) => {
         p.x += p.speedX;
         p.y += p.speedY;
@@ -241,20 +248,15 @@ enemies.forEach((enemy, ei) => {
 
     updateBoss();
 
-    // Collision banane / joueur
     bananas.forEach((b, bi) => {
-        if (
-            b.x < player.x + player.width &&
-            b.x + b.size > player.x &&
-            b.y < player.y + player.height &&
-            b.y + b.size > player.y
-        ) {
+        const playerBox = { x: player.x, y: player.y, size: player.width };
+        const bananaBox = { x: b.x, y: b.y, size: b.size };
+        if (rectsCollide(playerBox, bananaBox)) {
             bananas.splice(bi, 1);
             loseLife();
         }
     });
 
-    // Supprimer les bananes hors écran
     bananas = bananas.filter(b => b.y < canvas.height + 50);
 }
 
@@ -262,25 +264,21 @@ enemies.forEach((enemy, ei) => {
 //  DRAW
 // ===============================
 function draw() {
-    // Joueur
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
 
-    // Tirs
     player.bullets.forEach(b => {
         ctx.font = b.size + "px Arial";
         ctx.textAlign = "center";
         ctx.fillText(b.emoji, b.x, b.y);
     });
 
-    // Ennemis
     enemies.forEach(e => {
         ctx.font = e.size + "px Arial";
         ctx.textAlign = "center";
         ctx.fillText(e.emoji, e.x + e.size / 2, e.y + e.size);
     });
 
-    // Explosions
     explosions.forEach(p => {
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = p.color;
@@ -316,7 +314,6 @@ function createExplosion(x, y) {
 function spawnBoss() {
     bossActive = true;
     bossHP = 50;
-
     boss = {
         x: canvas.width / 2 - 180,
         y: 20,
@@ -329,7 +326,6 @@ function spawnBoss() {
 
 function bossAttack() {
     if (!bossActive || !boss) return;
-
     bananas.push({
         x: boss.x + boss.width / 2,
         y: boss.y + boss.height,
@@ -347,26 +343,18 @@ setInterval(() => {
 function updateBoss() {
     if (!bossActive || !boss) return;
 
-    // Déplacement horizontal
     boss.x += boss.speedX;
-    if (boss.x <= 0 || boss.x + boss.width >= canvas.width) {
-        boss.speedX *= -1;
-    }
+    if (boss.x <= 0 || boss.x + boss.width >= canvas.width) boss.speedX *= -1;
 
-    // Déplacement des bananes
     bananas.forEach(b => {
         b.y += b.speedY;
         b.x += b.angle;
     });
 
-    // Collision tirs / boss
     player.bullets.forEach((bullet, bi) => {
-        if (
-            bullet.x < boss.x + boss.width &&
-            bullet.x + bullet.size > boss.x &&
-            bullet.y < boss.y + boss.height &&
-            bullet.y + bullet.size > boss.y
-        ) {
+        const bulletBox = { x: bullet.x, y: bullet.y, size: bullet.size };
+        const bossBox = { x: boss.x, y: boss.y, size: boss.width };
+        if (rectsCollide(bulletBox, bossBox)) {
             bossHP--;
             player.bullets.splice(bi, 1);
             createExplosion(bullet.x, bullet.y);
@@ -380,26 +368,22 @@ function updateBoss() {
         }
     });
 
-    // Nettoyage des bananes hors écran
     bananas = bananas.filter(b => b.y < canvas.height + 50);
 }
 
 function drawBoss() {
     if (!bossActive || !boss) return;
 
-    // Boss
     ctx.font = "360px Arial";
     ctx.textAlign = "center";
     ctx.fillText(boss.emoji, boss.x + boss.width / 2, boss.y + boss.height - 40);
 
-    // Barre de vie
     ctx.fillStyle = "#ff0054";
     ctx.fillRect(boss.x, boss.y - 25, boss.width, 20);
 
     ctx.fillStyle = "#4cc9f0";
     ctx.fillRect(boss.x, boss.y - 25, (bossHP / 50) * boss.width, 20);
 
-    // Bananes
     bananas.forEach(b => {
         ctx.font = "30px Arial";
         ctx.fillText(b.emoji, b.x, b.y);
@@ -407,7 +391,7 @@ function drawBoss() {
 }
 
 // ===============================
-//  GAME OVER
+//  GAME OVER & BONOBO
 // ===============================
 function gameOver() {
     gameRunning = false;
@@ -428,9 +412,6 @@ function gameOver() {
     `;
 }
 
-// ===============================
-//  BONOBOS + LEADERBOARD + ENDLESS
-// ===============================
 function triggerBonoboEasterEgg() {
     gameRunning = false;
     clearInterval(gameInterval);
@@ -450,24 +431,29 @@ function triggerBonoboEasterEgg() {
     showEndlessButton();
 }
 
-function saveScore(name, score) {
+// ===============================
+//  LEADERBOARD
+// ===============================
+async function saveScore(name, score) {
     const shots = player.shots;
     const ratio = shots > 0 ? (score / shots).toFixed(2) : score;
 
+    let leaderboard = await fetchLeaderboard();
     leaderboard.push({ name, score, shots, ratio });
 
     leaderboard.sort((a, b) => b.score - a.score);
     leaderboard = leaderboard.slice(0, 10);
 
-    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+    await saveLeaderboard(leaderboard);
 }
 
-function showLeaderboard() {
-    const box = document.getElementById("leaderboard");
-    box.innerHTML = "<h3>Leaderboard</h3>";
+async function showLeaderboard() {
+    leaderboardBox.innerHTML = "<h3>Leaderboard</h3>";
+
+    const leaderboard = await fetchLeaderboard();
 
     leaderboard.forEach((entry, i) => {
-        box.innerHTML += `
+        leaderboardBox.innerHTML += `
             <p>
                 ${i + 1}. ${entry.name} — 
                 ${entry.score} pts — 
@@ -479,17 +465,13 @@ function showLeaderboard() {
 }
 
 function showEndlessButton() {
-    const box = document.getElementById("endless-btn-box");
-
-    box.innerHTML = `
+    endlessBtnBox.innerHTML = `
         <button id="endless-btn" class="btn" style="margin-top:20px;">
             Activer le Mode Endless
         </button>
     `;
 
-    document.getElementById("endless-btn").addEventListener("click", () => {
-        startEndlessMode();
-    });
+    document.getElementById("endless-btn").addEventListener("click", startEndlessMode);
 }
 
 function startEndlessMode() {
