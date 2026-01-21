@@ -791,23 +791,29 @@ body {
 
 /* Petit point lumineux */
 .cursor-dot {
-    width: 6px;
-    height: 6px;
+    width: 10px; /* au lieu de 6px */
+    height: 10px;
     background: var(--accent);
     border-radius: 50%;
-    box-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent-secondary);
+    box-shadow:
+        0 0 14px var(--accent),
+        0 0 28px var(--accent-secondary),
+        0 0 40px rgba(76, 201, 240, 0.6);
 }
 
 /* Halo holographique */
 .cursor-halo {
-    width: 28px;
-    height: 28px;
+    width: 40px; /* au lieu de 28px */
+    height: 40px;
     border-radius: 50%;
-    border: 2px solid rgba(76, 201, 240, 0.4);
-    box-shadow: 0 0 18px rgba(76, 201, 240, 0.25);
+    border: 3px solid rgba(76, 201, 240, 0.55); /* plus visible */
+    box-shadow:
+        0 0 22px rgba(76, 201, 240, 0.45),
+        0 0 40px rgba(157, 78, 221, 0.35);
     transition: transform 0.12s ease-out, opacity 0.25s ease;
-    opacity: 0.8;
+    opacity: 1; /* légèrement plus visible */
 }
+
 
 /* Effet sur les éléments interactifs */
 a:hover ~ .cursor-halo,
