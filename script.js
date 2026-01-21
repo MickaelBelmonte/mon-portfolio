@@ -5,30 +5,41 @@
 const toggleBtn = document.getElementById("theme-toggle");
 const body = document.body;
 
-toggleBtn.addEventListener("click", () => {
-    body.classList.toggle("light-mode");
-
-    if (body.classList.contains("light-mode")) {
+// Fonction pour appliquer le thème
+function applyTheme(theme) {
+    if (theme === "light") {
+        body.classList.add("light-mode");
         toggleBtn.textContent = "☀️";
-        localStorage.setItem("theme", "light");
     } else {
+        body.classList.remove("light-mode");
         toggleBtn.textContent = "🌙";
-        localStorage.setItem("theme", "dark");
     }
+}
+
+// Animation holographique lors du changement
+function triggerThemeTransition() {
+    body.classList.add("theme-transition");
+    setTimeout(() => body.classList.remove("theme-transition"), 600);
+}
+
+// Toggle du thème
+toggleBtn.addEventListener("click", () => {
+    const isLight = body.classList.toggle("light-mode");
+
+    applyTheme(isLight ? "light" : "dark");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+
+    triggerThemeTransition();
 });
 
 // Charger le thème sauvegardé
-if (localStorage.getItem("theme") === "light") {
-    body.classList.add("light-mode");
-    toggleBtn.textContent = "☀️";
-}
+applyTheme(localStorage.getItem("theme") || "dark");
 
 
 /* ------------------------------
    FILTRES DES PROJETS
 ------------------------------ */
 
-// Vérifie si on est sur la page projets
 const filterButtons = document.querySelectorAll(".filter-btn");
 const projectCards = document.querySelectorAll(".project-card");
 
@@ -37,17 +48,14 @@ if (filterButtons.length > 0) {
         btn.addEventListener("click", () => {
             const filter = btn.dataset.filter;
 
-            // Active le bouton sélectionné
             filterButtons.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
 
-            // Filtre les cartes
             projectCards.forEach(card => {
-                if (filter === "all" || card.classList.contains(filter)) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
+                card.style.display =
+                    filter === "all" || card.classList.contains(filter)
+                        ? "block"
+                        : "none";
             });
         });
     });
@@ -60,9 +68,7 @@ if (filterButtons.length > 0) {
 
 const fadeElements = document.querySelectorAll(".fade-in");
 
-const appearOptions = {
-    threshold: 0.2
-};
+const appearOptions = { threshold: 0.2 };
 
 const appearOnScroll = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
@@ -72,11 +78,12 @@ const appearOnScroll = new IntersectionObserver((entries, observer) => {
     });
 }, appearOptions);
 
-fadeElements.forEach(el => {
-    appearOnScroll.observe(el);
-});
+fadeElements.forEach(el => appearOnScroll.observe(el));
 
-/* CURSEUR IA HOLOGRAPHIQUE */
+
+/* ------------------------------
+   CURSEUR IA HOLOGRAPHIQUE
+------------------------------ */
 
 const cursorDot = document.querySelector(".cursor-dot");
 const cursorHalo = document.querySelector(".cursor-halo");
@@ -92,7 +99,6 @@ document.addEventListener("mousemove", (e) => {
     cursorDot.style.top = mouseY + "px";
 });
 
-/* Animation du halo avec un léger retard */
 function animateHalo() {
     haloX += (mouseX - haloX) * 0.12;
     haloY += (mouseY - haloY) * 0.12;
