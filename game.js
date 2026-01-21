@@ -32,22 +32,28 @@ async function fetchLeaderboard() {
             headers: { "X-Master-Key": API_KEY }
         });
         const data = await res.json();
-        return data.record || [];
+
+        // On attend une structure : { record: { leaderboard: [...] } }
+        if (data && data.record && Array.isArray(data.record.leaderboard)) {
+            return data.record.leaderboard;
+        }
+        return [];
     } catch (err) {
         console.error("Erreur récupération leaderboard :", err);
         return [];
     }
 }
 
-async function saveLeaderboard(data) {
+async function saveLeaderboard(leaderboardArray) {
     try {
+        // On envoie : { leaderboard: [...] }
         await fetch(LEADERBOARD_URL, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 "X-Master-Key": API_KEY
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ leaderboard: leaderboardArray })
         });
     } catch (err) {
         console.error("Erreur sauvegarde leaderboard :", err);
