@@ -822,3 +822,16 @@ button:hover ~ .cursor-halo {
     border-color: rgba(157, 78, 221, 0.6);
     box-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
 }
+
+.ia-status {
+    font-size: 0.8rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(148, 163, 184, 0.8);
+    margin-bottom: 8px;
+}
+
+.ia-status.thinking {
+    color: var(--accent);
+}
+
