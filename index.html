@@ -52,26 +52,6 @@
     <script src="particles.js"></script>
     <script src="script.js"></script>
 
-    <script>
-        /* Mode clair / sombre */
-        document.getElementById("theme-toggle").addEventListener("click", () => {
-            document.body.classList.toggle("light-mode");
-        });
-
-        /* Animation fade-in */
-        const elements = document.querySelectorAll('.fade-in');
-
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('appear');
-                }
-            });
-        });
-
-        elements.forEach(el => observer.observe(el));
-    </script>
-
 </body>
 </html>
 
