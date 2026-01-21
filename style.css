@@ -770,3 +770,49 @@ footer {
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
+
+/* ------------------------------
+   CURSEUR IA HOLOGRAPHIQUE
+--------------------------------*/
+
+body {
+    cursor: none; /* On masque le curseur normal */
+}
+
+.cursor-dot,
+.cursor-halo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+
+/* Petit point lumineux */
+.cursor-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent-secondary);
+}
+
+/* Halo holographique */
+.cursor-halo {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(76, 201, 240, 0.4);
+    box-shadow: 0 0 18px rgba(76, 201, 240, 0.25);
+    transition: transform 0.12s ease-out, opacity 0.25s ease;
+    opacity: 0.8;
+}
+
+/* Effet sur les éléments interactifs */
+a:hover ~ .cursor-halo,
+button:hover ~ .cursor-halo {
+    transform: translate(-50%, -50%) scale(1.6);
+    border-color: rgba(157, 78, 221, 0.6);
+    box-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
+}
