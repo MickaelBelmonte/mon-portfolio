@@ -2,95 +2,116 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Projets - Mon Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projets – Portfolio de Mickael Belmonte</title>
+
+    <!-- Polices IA -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+    <!-- CURSEUR IA -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-halo"></div>
+
+    <!-- PARTICULES -->
     <canvas id="particles"></canvas>
 
+    <!-- NAVBAR -->
     <header>
         <nav class="navbar">
             <h1 class="logo">Mon Portfolio</h1>
+
             <ul class="nav-links">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="projects.html">Projets</a></li>
                 <li><a href="about.html">À propos</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+
             <button id="theme-toggle" class="theme-btn">🌙</button>
         </nav>
     </header>
 
-    <main style="padding: 20px; max-width: 1000px; margin: auto;">
+    <!-- CONTENU PRINCIPAL -->
+    <main>
+        <section class="fade-in">
+            <h2 class="neon">Mes Projets</h2>
+            <p class="fade-in" style="opacity: 0.85; margin-bottom: 25px;">
+                Voici une sélection de projets que je développerai au fil de mon apprentissage.
+            </p>
 
-        <h2 class="neon">Mes Projets</h2>
-        <p style="opacity: 0.8; margin-bottom: 25px;">
-            Voici une sélection de projets que je développerai au fil de mon apprentissage.
-        </p>
-
-        <!-- Filtres -->
-        <div class="project-filters">
-            <button class="filter-btn active" data-filter="all">Tous</button>
-            <button class="filter-btn" data-filter="web">Web</button>
-            <button class="filter-btn" data-filter="python">Python</button>
-            <button class="filter-btn" data-filter="ia">IA</button>
-            <button class="filter-btn" data-filter="js">JS</button>
-        </div>
-
-        <!-- Grille des projets -->
-        <div class="projects-grid">
-
-            <!-- Projet 1 -->
-            <div class="project-card web fade-in">
-                <img src="assets/ARAJOUTER" alt="Projet 1" class="project-img">
-
-                <div class="project-tags">
-                    <span>HTML</span>
-                    <span>CSS</span>
-                </div>
-
-                <h3>Projet 1 — À venir</h3>
-                <p>Un projet web en préparation.</p>
-                <a href="#" class="btn">Voir plus</a>
+            <!-- Filtres -->
+            <div class="project-filters fade-in">
+                <button class="filter-btn active" data-filter="all">Tous</button>
+                <button class="filter-btn" data-filter="web">Web</button>
+                <button class="filter-btn" data-filter="python">Python</button>
+                <button class="filter-btn" data-filter="ia">IA</button>
+                <button class="filter-btn" data-filter="js">JS</button>
             </div>
 
-            <!-- Projet iAventures -->
-            <div class="project-card ia fade-in">
-                <img src="assets/iAventures.png" alt="Mini Aventures par "IA"" class="project-img">
-                
-               <div class="project-tags">
-                   <span>IA</span>
-                   <span>JS</span>
-               </div>
-                                        
-               <h3>L'iAventures</h3>
-               <p>Une sorte d'IA qui permet de générer aléatoirement des éléments.</p>                                            
-               <a href="IAventures.html" class="btn">Voir plus</a>
-            </div>-->
+            <!-- Grille des projets -->
+            <div class="projects-grid">
 
-            <!-- Neon Space Shooter -->
-            <div class="project-card ia fade-in">
-                <img src="assets/NeonSpaceShooter.png" alt="Projet 3" class="project-img">
+                <!-- Projet 1 -->
+                <div class="project-card web fade-in">
+                    <img src="assets/ARAJOUTER" alt="Projet 1" class="project-img">
 
-                <div class="project-tags">
-                    <span>IA</span>
-                    <span>JS</span>
+                    <div class="project-tags">
+                        <span>HTML</span>
+                        <span>CSS</span>
+                    </div>
+
+                    <h3>Projet 1 — À venir</h3>
+                    <p>Un projet web en préparation.</p>
+                    <a href="#" class="btn">Voir plus</a>
                 </div>
 
-                <h3>Le Neon Space Shooter</h3>
-                <p>Un petit jeux Space Shooter dans le style de mon jeux</p>
-                <a href="NeonSS.html" class="btn">JOUER</a>
-            </div>
+                <!-- Projet iAventures -->
+                <div class="project-card ia fade-in">
+                    <img src="assets/iAventures.png" alt="Mini Aventures IA" class="project-img">
 
-        </div>
+                    <div class="project-tags">
+                        <span>IA</span>
+                        <span>JS</span>
+                    </div>
+
+                    <h3>L'iAventures</h3>
+                    <p>Une IA qui génère aléatoirement des éléments.</p>
+                    <a href="IAventures.html" class="btn">Voir plus</a>
+                </div>
+
+                <!-- Neon Space Shooter -->
+                <div class="project-card js fade-in">
+                    <img src="assets/NeonSpaceShooter.png" alt="Neon Space Shooter" class="project-img">
+
+                    <div class="project-tags">
+                        <span>JS</span>
+                        <span>Game</span>
+                    </div>
+
+                    <h3>Neon Space Shooter</h3>
+                    <p>Un mini-jeu futuriste inspiré de ton style IA.</p>
+                    <a href="NeonSS.html" class="btn">JOUER</a>
+                </div>
+
+            </div>
+        </section>
     </main>
 
+    <!-- FOOTER -->
     <footer>
-        <p>© 2026 - MICKAEL BELMONTE</p>
+        <p class="signature">© 2026 — MICKAEL BELMONTE</p>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="particles.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>
+
