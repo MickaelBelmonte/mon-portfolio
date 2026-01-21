@@ -2,68 +2,97 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>À propos - Mon Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À propos – Portfolio de Mickael Belmonte</title>
+
+    <!-- Polices IA -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+    <!-- CURSEUR IA -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-halo"></div>
+
+    <!-- PARTICULES -->
     <canvas id="particles"></canvas>
 
+    <!-- NAVBAR -->
     <header>
         <nav class="navbar">
             <h1 class="logo">Mon Portfolio</h1>
+
             <ul class="nav-links">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="projects.html">Projets</a></li>
                 <li><a href="about.html">À propos</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+
             <button id="theme-toggle" class="theme-btn">🌙</button>
         </nav>
     </header>
 
-    <main style="padding: 20px;">
-        <h2>À propos de moi</h2>
-        <p>Je débute en informatique et je souhaite intégrer un Bachelor Informatique puis un Mastère IA & Data en alternance.</p>
-        <p>Je suis motivé, curieux et je construis ce portfolio pour montrer ma progression.</p>
-        <img src="assets/Moi.png" alt="Moi" class="profile-img">
+    <!-- CONTENU -->
+    <main>
+        <section class="fade-in">
+            <h2 class="neon">À propos de moi</h2>
 
-        <h2 class="neon">Mon Parcours</h2>
+            <p>
+                Je débute en informatique et je souhaite intégrer un Bachelor Informatique puis un Mastère IA & Data en alternance.
+            </p>
+            <p>
+                Je suis motivé, curieux et je construis ce portfolio pour montrer ma progression.
+            </p>
 
-        <div class="timeline">
+            <img src="assets/Moi.png" alt="Photo de moi" class="profile-img">
+        </section>
 
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <h3>2017 – Obtention de mon Baccalauréat et début dans la vente Automobile</h3>
-                    <p></p>
+        <section class="fade-in">
+            <h2 class="neon">Mon Parcours</h2>
+
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>2017 – Obtention du Baccalauréat & début dans la vente automobile</h3>
+                        <p></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <h3>2026 - Orientation dans le domaine de la Technologie</h3>
-                    <p>Préparation d'un Bachelor Informatique par passion et avenir.</p>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>2026 – Orientation dans le domaine de la technologie</h3>
+                        <p>Préparation d'un Bachelor Informatique par passion et ambition professionnelle.</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <h3>2026 – Recherche d’alternance</h3>
-                    <p>Avec une horizon jusqu'à 5 ans, préparation d'un Mastère IA & DATA</p>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>2026 – Recherche d’alternance</h3>
+                        <p>Objectif : poursuivre vers un Mastère IA & Data dans les années à venir.</p>
+                    </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
+        </section>
     </main>
 
+    <!-- FOOTER -->
     <footer>
-        <p>© 2026 - MICKAEL BELMONTE</p>
+        <p class="signature">© 2026 — MICKAEL BELMONTE</p>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="particles.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>
