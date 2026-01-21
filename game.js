@@ -26,6 +26,7 @@ const endlessBtnBox = document.getElementById("endless-btn-box");
 const LEADERBOARD_URL = "https://api.jsonbin.io/v3/b/69709cecd0ea881f407a366b";
 const API_KEY = "$2a$10$gCD0Qxxs.NzWK6d1EzrL.emnDKT8Ou2MlGK150480W86zb/qeYtXa";
 
+// Lecture du leaderboard
 async function fetchLeaderboard() {
     try {
         const res = await fetch(LEADERBOARD_URL, {
@@ -33,10 +34,11 @@ async function fetchLeaderboard() {
         });
         const data = await res.json();
 
-        // On attend une structure : { record: { leaderboard: [...] } }
+        // Structure attendue : { record: { leaderboard: [...] } }
         if (data && data.record && Array.isArray(data.record.leaderboard)) {
             return data.record.leaderboard;
         }
+
         return [];
     } catch (err) {
         console.error("Erreur récupération leaderboard :", err);
@@ -44,9 +46,9 @@ async function fetchLeaderboard() {
     }
 }
 
+// Sauvegarde du leaderboard
 async function saveLeaderboard(leaderboardArray) {
     try {
-        // On envoie : { leaderboard: [...] }
         await fetch(LEADERBOARD_URL, {
             method: "PUT",
             headers: {
@@ -98,6 +100,7 @@ const keys = {};
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
+// Tir
 document.addEventListener("keydown", e => {
     if (e.key === " " && gameRunning) {
         player.bullets.push({
@@ -399,7 +402,7 @@ function drawBoss() {
 // ===============================
 //  GAME OVER & BONOBO
 // ===============================
-function gameOver() {
+async function gameOver() {
     gameRunning = false;
     clearInterval(gameInterval);
     clearInterval(enemySpawnInterval);
@@ -407,8 +410,8 @@ function gameOver() {
     let name = prompt("Game Over ! Entre ton pseudo pour le leaderboard :");
     if (!name) name = "Anonyme";
 
-    saveScore(name, score);
-    showLeaderboard();
+    await saveScore(name, score);
+    await showLeaderboard();
     showEndlessButton();
 
     bonoboMessage.style.display = "block";
@@ -418,7 +421,7 @@ function gameOver() {
     `;
 }
 
-function triggerBonoboEasterEgg() {
+async function triggerBonoboEasterEgg() {
     gameRunning = false;
     clearInterval(gameInterval);
     clearInterval(enemySpawnInterval);
@@ -432,8 +435,8 @@ function triggerBonoboEasterEgg() {
     let name = prompt("Entre ton pseudo pour le leaderboard :");
     if (!name) name = "Anonyme";
 
-    saveScore(name, score);
-    showLeaderboard();
+    await saveScore(name, score);
+    await showLeaderboard();
     showEndlessButton();
 }
 
@@ -470,6 +473,9 @@ async function showLeaderboard() {
     });
 }
 
+// ===============================
+//  MODE ENDLESS
+// ===============================
 function showEndlessButton() {
     endlessBtnBox.innerHTML = `
         <button id="endless-btn" class="btn" style="margin-top:20px;">
