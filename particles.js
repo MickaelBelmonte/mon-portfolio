@@ -1,5 +1,5 @@
-const canvas = document.getElementById("particles");
-const ctx = canvas.getContext("2d");
+const particlesCanvas = document.getElementById("particles");
+const particlesCtx = particlesCanvas.getContext("2d");
 
 let particlesArray = [];
 let mouse = { x: null, y: null, radius: 120 };
@@ -11,8 +11,8 @@ window.addEventListener("mousemove", (e) => {
 
 // Ajuste la taille du canvas
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    particlesCanvas.width = window.innerWidth;
+    particlesCanvas.height = window.innerHeight;
 }
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
@@ -20,12 +20,11 @@ window.addEventListener("resize", resizeCanvas);
 // Création des particules
 class Particle {
     constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * particlesCanvas.width;
+        this.y = Math.random() * particlesCanvas.height;
 
         this.size = Math.random() * 2 + 1;
 
-        // Couleurs cyan/violet
         const colors = ["#4cc9f0", "#9d4edd"];
         this.color = colors[Math.floor(Math.random() * colors.length)];
 
@@ -37,7 +36,6 @@ class Particle {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Réaction à la souris
         let dx = mouse.x - this.x;
         let dy = mouse.y - this.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
@@ -47,25 +45,24 @@ class Particle {
             this.y -= dy / 20;
         }
 
-        // Repositionnement si sortie d'écran
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        if (this.x < 0 || this.x > particlesCanvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > particlesCanvas.height) this.speedY *= -1;
     }
 
     draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color + "cc"; // légère transparence
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = this.color;
-        ctx.fill();
+        particlesCtx.beginPath();
+        particlesCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        particlesCtx.fillStyle = this.color + "cc";
+        particlesCtx.shadowBlur = 12;
+        particlesCtx.shadowColor = this.color;
+        particlesCtx.fill();
     }
 }
 
 // Initialisation
 function initParticles() {
     particlesArray = [];
-    let numberOfParticles = Math.floor((canvas.width * canvas.height) / 15000);
+    let numberOfParticles = Math.floor((particlesCanvas.width * particlesCanvas.height) / 15000);
 
     for (let i = 0; i < numberOfParticles; i++) {
         particlesArray.push(new Particle());
@@ -82,12 +79,12 @@ function connectParticles() {
             let distance = dx * dx + dy * dy;
 
             if (distance < 9000) {
-                ctx.strokeStyle = "rgba(76, 201, 240, 0.15)";
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                ctx.stroke();
+                particlesCtx.strokeStyle = "rgba(76, 201, 240, 0.15)";
+                particlesCtx.lineWidth = 1;
+                particlesCtx.beginPath();
+                particlesCtx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                particlesCtx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                particlesCtx.stroke();
             }
         }
     }
@@ -95,7 +92,7 @@ function connectParticles() {
 
 // Animation
 function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particlesCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
 
     particlesArray.forEach((p) => {
         p.update();
@@ -107,4 +104,3 @@ function animate() {
 }
 
 animate();
-
