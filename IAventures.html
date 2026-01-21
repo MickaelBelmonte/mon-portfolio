@@ -42,7 +42,7 @@
             <h2 class="neon">Bienvenue sur mon IAventures !</h2>
 
             <p class="fade-in" style="opacity: 0.85;">
-                Un générateur d'aventure comme le ferait une "IA" très basique avec quelques bases.
+                Une petite intelligence artificielle expérimentale qui génère des mondes, des créatures, des cartes et des histoires… et qui apprend de ses propres créations.
             </p>
 
             <!-- Boutons -->
@@ -53,7 +53,11 @@
                 <button class="btn" onclick="genererCreature()">Créer une créature</button>
                 <button class="btn" onclick="genererCarte()">Carte ASCII</button>
                 <button class="btn" onclick="genererHistoire()">Histoire complète</button>
+                <button class="btn" onclick="toggleAventureContinue()">Aventure continue</button>
             </div>
+
+            <!-- Statut IA -->
+            <div id="ia-status" class="ia-status fade-in">En attente...</div>
 
             <!-- Zone de sortie -->
             <pre id="output" class="output-box fade-in"></pre>
@@ -73,4 +77,3 @@
 
 </body>
 </html>
-
