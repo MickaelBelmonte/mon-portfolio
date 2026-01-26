@@ -1,1 +1,6 @@
+rajouter dans les assets 
 
+board_music.mp3 pour la musique du plateau
+dice.wav pour la musique des dés
+bonus.wav
+malus.wav
