@@ -53,23 +53,24 @@ function createOrJoinRoom(playerName, callback) {
     const playerId = randomId();
     const playerRef = roomRef.child('players/' + playerId);
 
-    playerRef.set({
-      name: playerName,
-      ready: false,
-      score: 0,
-      tile: 0,
-      x: 100,
-      finished: false,
-      rank: null,
-      items: {
-        bananaBoost: 0,
-        shield: 0,
-        goldenDice: 0
-      }
-    }).then(() => {
-      callback(roomRef, playerId);
-    });
-playerRef.onDisconnect().remove();
+playerRef.set({
+  name: playerName,
+  ready: false,
+  score: 0,
+  tile: 0,
+  x: 100,
+  finished: false,
+  rank: null,
+  items: {
+    bananaBoost: 0,
+    shield: 0,
+    goldenDice: 0
+  }
+}).then(() => {
+  playerRef.onDisconnect().remove();
+
+  callback(roomRef, playerId);
+});
   });
 }
 
