@@ -54,7 +54,7 @@ function createOrJoinRoom(playerName, callback) {
     const playerRef = roomRef.child('players/' + playerId);
 
     playerRef.set({
-      name: playerName || ('Joueur ' + playerId),
+      name: playerName,
       ready: false,
       score: 0,
       tile: 0,
