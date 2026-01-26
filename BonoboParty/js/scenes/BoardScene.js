@@ -45,6 +45,15 @@ class BoardScene extends Phaser.Scene {
       fill: '#ffdd88'
     }).setOrigin(0.5);
 
+    // --- Timer de tour ---
+    this.turnTime = 20;          // secondes par tour
+    this.turnTimer = null;
+    this.remainingTime = 0;
+    this.timerText = this.add.text(width - 120, 40, '', {
+      fontSize: '26px',
+      fill: '#ffdd55'
+    }).setOrigin(0.5);
+
     this.players = {};
     this.currentTurn = null;
     this.activeItem = null;
@@ -102,13 +111,16 @@ class BoardScene extends Phaser.Scene {
     if (this.currentTurn === this.playerId) {
       this.rollButton.setAlpha(1);
       this.rollButton.setInteractive();
+      this.startTurnTimer();
     } else {
       this.rollButton.setAlpha(0.5);
       this.rollButton.disableInteractive();
+      this.stopTurnTimer();
     }
 
     if (data.state === 'minigame') {
       this.music.stop();
+      this.stopTurnTimer();
       this.scene.start('GameScene');
     }
   }
@@ -134,6 +146,9 @@ class BoardScene extends Phaser.Scene {
         value = Phaser.Math.Between(4, 6);
       }
 
+      // On garde l’info du bouclier pour ce tour
+      const usedShield = this.activeItem === 'shield';
+
       this.activeItem = null;
 
       let newTile = currentTile + value;
@@ -150,7 +165,7 @@ class BoardScene extends Phaser.Scene {
       }
 
       if (this.malusTiles.includes(newTile)) {
-        if (data.items && data.items.shield > 0 && this.activeItem === 'shield') {
+        if (usedShield) {
           this.showFloatingText(tile.x, tile.y - 60, 'Bouclier !');
         } else {
           addScore(this.roomRef, this.playerId, -1);
@@ -167,6 +182,9 @@ class BoardScene extends Phaser.Scene {
         this.sound.play('bonusSound');
         this.showFloatingText(tile.x, tile.y - 90, 'Objet obtenu !');
       }
+
+      // Fin de tour : on arrête le timer et on passe au suivant
+      this.stopTurnTimer();
 
       if (newTile === 11) {
         setRoomState(this.roomRef, 'minigame');
@@ -261,6 +279,46 @@ class BoardScene extends Phaser.Scene {
       alpha: 0,
       duration: 800,
       onComplete: () => t.destroy()
+    });
+  }
+
+  // --- Timer de tour ---
+
+  startTurnTimer() {
+    this.stopTurnTimer();
+
+    this.remainingTime = this.turnTime;
+    this.timerText.setText(this.remainingTime + 's');
+
+    this.turnTimer = this.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: () => {
+        this.remainingTime--;
+        this.timerText.setText(this.remainingTime + 's');
+
+        if (this.remainingTime <= 0) {
+          this.stopTurnTimer();
+          this.forceNextPlayer();
+        }
+      }
+    });
+  }
+
+  stopTurnTimer() {
+    if (this.turnTimer) {
+      this.turnTimer.remove();
+      this.turnTimer = null;
+    }
+    this.timerText.setText('');
+  }
+
+  forceNextPlayer() {
+    this.roomRef.get().then(snapshot => {
+      const data = snapshot.val();
+      const order = data.turnOrder || [];
+      const nextIndex = (data.turnIndex + 1) % order.length;
+      this.roomRef.child('turnIndex').set(nextIndex);
     });
   }
 }
