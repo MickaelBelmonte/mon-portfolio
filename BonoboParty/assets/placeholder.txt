@@ -4,3 +4,39 @@ board_music.mp3 pour la musique du plateau
 dice.wav pour la musique des dés
 bonus.wav
 malus.wav
+
+Fond & plateau
+
+assets/bg_jungle.png → grand fond jungle (1920×1080 par ex.)
+
+assets/board_path.png → le plateau vu de dessus (chemin de cases)
+
+Cases
+
+assets/tile_normal.png
+
+assets/tile_bonus.png
+
+assets/tile_malus.png
+
+assets/tile_item.png
+
+Joueurs
+
+assets/bonobo_idle.png → spritesheet idle (par ex. 4 frames)
+
+assets/bonobo_walk.png → spritesheet marche (8 frames)
+
+Objets
+
+assets/item_banana.png
+
+assets/item_shield.png
+
+assets/item_golden_dice.png
+
+UI
+
+assets/ui_button.png
+
+assets/ui_panel.png
