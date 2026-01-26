@@ -103,6 +103,17 @@ function setRoomState(roomRef, state) {
 }
 
 /* ---------------------------------------------------------
+   CLASSEMENT
+--------------------------------------------------------- */
+
+function addScore(roomRef, playerId, amount) {
+  return roomRef.child('players/' + playerId + '/score').transaction(score => {
+    return (score || 0) + amount;
+  });
+}
+
+
+/* ---------------------------------------------------------
    Quitter une room
 --------------------------------------------------------- */
 function leaveRoom(roomRef, playerId) {
