@@ -6,14 +6,14 @@ class LobbyScene extends Phaser.Scene {
   create() {
     const centerX = this.cameras.main.width / 2;
 
+    this.roomCode = this.registry.get('roomCode');
+    this.roomRef = this.registry.get('roomRef');
+    this.playerId = this.registry.get('playerId');
+
     this.add.text(centerX, 60, 'Lobby Bonobo Party', {
       fontSize: '40px',
       fill: '#ffdd55'
     }).setOrigin(0.5);
-
-    this.roomCode = this.registry.get('roomCode');
-    this.roomRef = this.registry.get('roomRef');
-    this.playerId = this.registry.get('playerId');
 
     this.add.text(centerX, 120, 'Code de la partie : ' + this.roomCode, {
       fontSize: '26px',
@@ -26,7 +26,7 @@ class LobbyScene extends Phaser.Scene {
       align: 'center'
     }).setOrigin(0.5);
 
-    // Bouton "Je suis prêt"
+    // Bouton prêt
     this.readyButton = this.add.text(centerX, 400, '[ JE SUIS PRÊT ]', {
       fontSize: '32px',
       fill: '#00ff88'
@@ -34,9 +34,11 @@ class LobbyScene extends Phaser.Scene {
 
     this.readyButton.on('pointerdown', () => {
       setPlayerReady(this.roomRef, this.playerId, true);
+      this.readyButton.setFill('#008844');
+      this.readyButton.setText('[ EN ATTENTE DES AUTRES ]');
     });
 
-    // Écoute en temps réel
+    // Écoute Firebase
     listenRoom(this.roomRef, (data) => {
       this.updateLobby(data);
     });
@@ -46,6 +48,14 @@ class LobbyScene extends Phaser.Scene {
     if (!data || !data.players) return;
 
     const players = Object.entries(data.players);
+
+    // Limite à 3 joueurs
+    if (players.length > 3) {
+      this.playersText.setText('La partie est pleine (3 joueurs max)');
+      return;
+    }
+
+    // Affichage des joueurs
     const lines = players.map(([id, p]) => {
       const status = p.ready ? '✔️ Prêt' : '⏳ Pas prêt';
       return `${id} : ${status}`;
@@ -70,3 +80,4 @@ class LobbyScene extends Phaser.Scene {
     });
   }
 }
+
