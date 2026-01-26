@@ -4,12 +4,8 @@ class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    // Charger les assets plus tard
-    this.createLoadingAnimation();
-  }
-
-  createLoadingAnimation() {
     const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
     const groundY = this.cameras.main.height - 80;
 
     this.add.text(centerX, 40, 'Chargement de la jungle...', {
@@ -17,11 +13,10 @@ class PreloadScene extends Phaser.Scene {
       fill: '#ffffff'
     }).setOrigin(0.5);
 
-    // Sol
     this.add.rectangle(centerX, groundY + 40, 900, 80, 0x3b2a1a)
       .setStrokeStyle(2, 0x2a1b10);
 
-    // --- BONOBO ---
+    // Bonobo
     this.bonobo = this.add.container(centerX - 150, groundY);
     this.bonobo.add([
       this.add.rectangle(0, 10, 40, 50, 0x5b3b24).setOrigin(0.5, 1),
@@ -31,47 +26,39 @@ class PreloadScene extends Phaser.Scene {
       this.add.circle(8, -30, 5, 0xffffff),
       this.add.circle(-8, -30, 2, 0x000000),
       this.add.circle(8, -30, 2, 0x000000),
-
-      this.add.arc(20, 0, 18, 180, 320, false)
-        .setStrokeStyle(4, 0x5b3b24)
+      this.add.arc(20, 0, 18, 180, 320, false).setStrokeStyle(4, 0x5b3b24)
     ]);
 
-    // --- MOUFLE ---
+    // Moufle
     this.moufle = this.add.container(centerX + 40, groundY);
     this.moufle.add([
       this.add.rectangle(0, 0, 40, 50, 0xb02040).setOrigin(0.5, 1),
       this.add.circle(-18, -20, 12, 0xb02040)
     ]);
 
-    // --- BANANE ---
+    // Banane
     this.banana = this.add.container(centerX - 150, groundY - 120);
     this.banana.add([
       this.add.circle(0, 0, 40, 0xffffaa, 0.4),
-
-      this.add.arc(0, 0, 20, 200, 340, false)
-        .setStrokeStyle(8, 0xf7d64a)
+      this.add.arc(0, 0, 20, 200, 340, false).setStrokeStyle(8, 0xf7d64a)
     ]);
     this.banana.setAlpha(0);
 
-    // --- BARRE DE CHARGEMENT ---
+    // Barre de chargement
     const barWidth = 400;
     const barY = groundY + 50;
 
     this.add.rectangle(centerX, barY, barWidth, 16, 0x000000, 0.4).setOrigin(0.5);
     this.loadingFill = this.add.rectangle(centerX - barWidth / 2, barY, 0, 12, 0xf7d64a).setOrigin(0, 0.5);
 
-    // Animations
-    this.animateCharacters();
-
-    // SONS
-
+    // Sons
     this.load.audio('boardMusic', 'assets/board_music.mp3');
     this.load.audio('diceSound', 'assets/dice.wav');
     this.load.audio('bonusSound', 'assets/bonus.wav');
     this.load.audio('malusSound', 'assets/malus.wav');
 
+    this.animateCharacters();
 
-    // Progression
     this.progress = 0;
     this.time.addEvent({
       delay: 200,
@@ -161,3 +148,4 @@ class PreloadScene extends Phaser.Scene {
     this.time.delayedCall(700, () => particles.destroy());
   }
 }
+
