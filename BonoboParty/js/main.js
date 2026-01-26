@@ -12,13 +12,15 @@ const config = {
     }
   },
 
-  scene: [
-    BootScene,
-    PreloadScene,
-    MenuScene,
-    LobbyScene,
-    GameScene
-  ]
+scene: [
+  BootScene,
+  PreloadScene,
+  MenuScene,
+  LobbyScene,
+  BoardScene,
+  GameScene
+]
+
 };
 
 const game = new Phaser.Game(config);
