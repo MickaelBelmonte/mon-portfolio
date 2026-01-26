@@ -36,7 +36,7 @@ class LobbyScene extends Phaser.Scene {
       this.registry.set('roomRef', roomRef);
       this.registry.set('playerId', playerId);
 
-      this.statusText.setText('En attente de joueurs...');
+      this.statusText.setText('En attente de singes...');
 
       listenRoom(roomRef, data => this.updateLobby(data));
     });
