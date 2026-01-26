@@ -242,7 +242,7 @@ class GameScene extends Phaser.Scene {
     backText.on('pointerout', () => backText.setFill('#ffdd55'));
 
     backText.on('pointerdown', () => {
-      this.scene.start('MenuScene');
+      this.scene.start('BoardScene');
     });
   }
 }
