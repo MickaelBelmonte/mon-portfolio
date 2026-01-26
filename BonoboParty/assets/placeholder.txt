@@ -64,3 +64,9 @@ mg_bonobo_run.png → spritesheet 8 frames (course)
 mg_hit.wav → bruit d’impact
 
 mg_boost.wav → bruit de boost
+
+
+============= leaderboard ===================
+pdium.png
+confetti.png
+victory_music.mp3
