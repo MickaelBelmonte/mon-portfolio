@@ -62,6 +62,15 @@ class PreloadScene extends Phaser.Scene {
     this.load.audio('diceSound', 'assets/dice.wav');
     this.load.audio('bonusSound', 'assets/bonus.wav');
     this.load.audio('malusSound', 'assets/malus.wav');
+    
+    // ---------------------------------------------------------
+    // ASSETS LEADERBOARD
+    // ---------------------------------------------------------
+
+    this.load.image('podium', 'assets/podium.png');
+    this.load.image('confetti', 'assets/confetti.png');
+    this.load.audio('victoryMusic', 'assets/victory_music.mp3');
+
 
     // ---------------------------------------------------------
     // 🏃 ASSETS DU MINI-JEU (Course aux Noix)
