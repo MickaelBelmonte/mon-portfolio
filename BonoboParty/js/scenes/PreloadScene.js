@@ -4,52 +4,58 @@ class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    const centerX = this.cameras.main.width / 2;
-    const centerY = this.cameras.main.height / 2;
-    const groundY = this.cameras.main.height - 80;
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
 
-    this.add.text(centerX, 40, 'Chargement de la jungle...', {
-      fontSize: '28px',
+    // --- Texte de chargement ---
+    this.add.text(width / 2, height / 2 - 200, 'Chargement...', {
+      fontSize: '32px',
       fill: '#ffffff'
     }).setOrigin(0.5);
 
-    this.add.rectangle(centerX, groundY + 40, 900, 80, 0x3b2a1a)
-      .setStrokeStyle(2, 0x2a1b10);
+    // --- Barre de chargement ---
+    const barBg = this.add.rectangle(width / 2, height / 2, 400, 20, 0x333333);
+    const barFill = this.add.rectangle(width / 2 - 200, height / 2, 0, 20, 0x88ff88).setOrigin(0, 0.5);
 
-    // Bonobo
-    this.bonobo = this.add.container(centerX - 150, groundY);
-    this.bonobo.add([
-      this.add.rectangle(0, 10, 40, 50, 0x5b3b24).setOrigin(0.5, 1),
-      this.add.circle(0, -30, 20, 0x5b3b24),
-      this.add.ellipse(0, -25, 28, 22, 0xc48a5a),
-      this.add.circle(-8, -30, 5, 0xffffff),
-      this.add.circle(8, -30, 5, 0xffffff),
-      this.add.circle(-8, -30, 2, 0x000000),
-      this.add.circle(8, -30, 2, 0x000000),
-      this.add.arc(20, 0, 18, 180, 320, false).setStrokeStyle(4, 0x5b3b24)
-    ]);
+    this.load.on('progress', p => {
+      barFill.width = 400 * p;
+    });
 
-    // Moufle
-    this.moufle = this.add.container(centerX + 40, groundY);
-    this.moufle.add([
-      this.add.rectangle(0, 0, 40, 50, 0xb02040).setOrigin(0.5, 1),
-      this.add.circle(-18, -20, 12, 0xb02040)
-    ]);
+    // ---------------------------------------------------------
+    // 🌴 ASSETS DU PLATEAU (style cartoon jungle)
+    // ---------------------------------------------------------
 
-    // Banane
-    this.banana = this.add.container(centerX - 150, groundY - 120);
-    this.banana.add([
-      this.add.circle(0, 0, 40, 0xffffaa, 0.4),
-      this.add.arc(0, 0, 20, 200, 340, false).setStrokeStyle(8, 0xf7d64a)
-    ]);
-    this.banana.setAlpha(0);
+    // Fond jungle
+    this.load.image('bg_jungle', 'assets/bg_jungle.png');
 
-    // Barre de chargement
-    const barWidth = 400;
-    const barY = groundY + 50;
+    // Plateau
+    this.load.image('board_path', 'assets/board_path.png');
 
-    this.add.rectangle(centerX, barY, barWidth, 16, 0x000000, 0.4).setOrigin(0.5);
-    this.loadingFill = this.add.rectangle(centerX - barWidth / 2, barY, 0, 12, 0xf7d64a).setOrigin(0, 0.5);
+    // Cases
+    this.load.image('tile_normal', 'assets/tile_normal.png');
+    this.load.image('tile_bonus', 'assets/tile_bonus.png');
+    this.load.image('tile_malus', 'assets/tile_malus.png');
+    this.load.image('tile_item', 'assets/tile_item.png');
+
+    // Joueurs (spritesheets)
+    this.load.spritesheet('bonobo_idle', 'assets/bonobo_idle.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    });
+
+    this.load.spritesheet('bonobo_walk', 'assets/bonobo_walk.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    });
+
+    // Objets
+    this.load.image('item_banana', 'assets/item_banana.png');
+    this.load.image('item_shield', 'assets/item_shield.png');
+    this.load.image('item_golden_dice', 'assets/item_golden_dice.png');
+
+    // UI
+    this.load.image('ui_button', 'assets/ui_button.png');
+    this.load.image('ui_panel', 'assets/ui_panel.png');
 
     // Sons
     this.load.audio('boardMusic', 'assets/board_music.mp3');
@@ -57,95 +63,67 @@ class PreloadScene extends Phaser.Scene {
     this.load.audio('bonusSound', 'assets/bonus.wav');
     this.load.audio('malusSound', 'assets/malus.wav');
 
-    this.animateCharacters();
+    // ---------------------------------------------------------
+    // 🏃 ASSETS DU MINI-JEU (Course aux Noix)
+    // ---------------------------------------------------------
 
-    this.progress = 0;
-    this.time.addEvent({
-      delay: 200,
-      repeat: 25,
-      callback: () => this.updateLoading()
+    // Fond du mini-jeu
+    this.load.image('mg_bg_jungle', 'assets/mg_bg_jungle.png');
+
+    // Ligne d'arrivée
+    this.load.image('mg_finish', 'assets/mg_finish.png');
+
+    // Obstacles
+    this.load.image('mg_rock', 'assets/mg_rock.png');
+    this.load.image('mg_trunk', 'assets/mg_trunk.png');
+
+    // Bonus du mini-jeu
+    this.load.image('mg_banana', 'assets/mg_banana.png');
+
+    // Joueur (mini-jeu) — animations séparées si tu veux un style différent
+    this.load.spritesheet('mg_bonobo_run', 'assets/mg_bonobo_run.png', {
+      frameWidth: 64,
+      frameHeight: 64
     });
+
+    // Sons mini-jeu
+    this.load.audio('mg_hit', 'assets/mg_hit.wav');
+    this.load.audio('mg_boost', 'assets/mg_boost.wav');
   }
 
-  animateCharacters() {
-    this.tweens.add({
-      targets: this.bonobo,
-      y: this.bonobo.y - 6,
-      duration: 200,
-      yoyo: true,
+  create() {
+    // ---------------------------------------------------------
+    // 🎞️ ANIMATIONS DU BONOBO (plateau)
+    // ---------------------------------------------------------
+
+    this.anims.create({
+      key: 'bonobo_idle_anim',
+      frames: this.anims.generateFrameNumbers('bonobo_idle', { start: 0, end: 3 }),
+      frameRate: 4,
       repeat: -1
     });
 
-    this.tweens.add({
-      targets: this.moufle,
-      y: this.moufle.y - 10,
-      duration: 300,
-      yoyo: true,
+    this.anims.create({
+      key: 'bonobo_walk_anim',
+      frames: this.anims.generateFrameNumbers('bonobo_walk', { start: 0, end: 7 }),
+      frameRate: 10,
       repeat: -1
     });
-  }
 
-  updateLoading() {
-    this.progress += 4;
-    if (this.progress > 100) this.progress = 100;
+    // ---------------------------------------------------------
+    // 🎞️ ANIMATIONS DU BONOBO (mini-jeu)
+    // ---------------------------------------------------------
 
-    const barWidth = 400;
-    this.loadingFill.width = (this.progress / 100) * barWidth;
-
-    if (this.progress === 60) {
-      this.tweens.add({
-        targets: this.banana,
-        alpha: 1,
-        y: this.banana.y + 10,
-        duration: 600,
-        ease: 'Sine.easeOut'
-      });
-    }
-
-    if (this.progress === 80) {
-      this.tweens.add({
-        targets: this.bonobo,
-        scale: 1.05,
-        duration: 300,
-        yoyo: true,
-        repeat: 1
-      });
-      this.addParticlesAroundBonobo();
-    }
-
-    if (this.progress === 95) {
-      this.tweens.add({
-        targets: this.moufle,
-        x: this.cameras.main.width + 200,
-        y: this.moufle.y - 150,
-        angle: 360,
-        duration: 500,
-        ease: 'Cubic.easeIn',
-        onComplete: () => this.moufle.setVisible(false)
-      });
-    }
-
-    if (this.progress === 100) {
-      this.time.delayedCall(700, () => {
-        this.scene.start('MenuScene');
-      });
-    }
-  }
-
-  addParticlesAroundBonobo() {
-    const particles = this.add.particles(0xffffaa);
-    particles.createEmitter({
-      x: this.bonobo.x,
-      y: this.bonobo.y - 40,
-      speed: { min: -40, max: 40 },
-      angle: { min: 0, max: 360 },
-      lifespan: 600,
-      quantity: 4,
-      scale: { start: 0.4, end: 0 },
-      blendMode: 'ADD'
+    this.anims.create({
+      key: 'mg_bonobo_run_anim',
+      frames: this.anims.generateFrameNumbers('mg_bonobo_run', { start: 0, end: 7 }),
+      frameRate: 12,
+      repeat: -1
     });
 
-    this.time.delayedCall(700, () => particles.destroy());
+    // ---------------------------------------------------------
+    // Fin du chargement → Menu
+    // ---------------------------------------------------------
+    this.scene.start('MenuScene');
   }
 }
-
