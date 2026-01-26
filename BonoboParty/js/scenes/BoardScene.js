@@ -120,6 +120,7 @@ class BoardScene extends Phaser.Scene {
     // --- Sync Firebase ---
     listenRoom(this.roomRef, data => this.syncFromFirebase(data));
   }
+  
 
   // --- Activation / désactivation du bouton ---
   setRollButtonEnabled(enabled) {
@@ -194,12 +195,23 @@ class BoardScene extends Phaser.Scene {
       this.stopTurnTimer();
     }
 
-    // --- Passage au mini-jeu ---
-    if (data.state === 'minigame') {
-      this.music.stop();
-      this.stopTurnTimer();
-      this.scene.start('GameScene');
-    }
+// Passage au mini-jeu
+if (data.state === 'minigame') {
+  this.music.stop();
+  this.stopTurnTimer();
+  this.scene.start('GameScene');
+  return;
+}
+
+// Passage au podium final
+if (data.state === 'end') {
+  this.music.stop();
+  this.stopTurnTimer();
+  this.scene.start('EndScene');
+  return;
+}
+
+    
   }
 
   // --- Lancer le dé ---
@@ -269,6 +281,10 @@ class BoardScene extends Phaser.Scene {
           const order = d.turnOrder || [];
           const nextIndex = (d.turnIndex + 1) % order.length;
           this.roomRef.child('turnIndex').set(nextIndex);
+     if (d.turnIndex >= 10) {
+     setRoomState(this.roomRef, 'end');
+}
+
         });
       }
     });
