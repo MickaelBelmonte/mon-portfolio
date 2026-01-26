@@ -1,26 +1,25 @@
 const config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  backgroundColor: '#1a2f1a',
-
+  parent: 'game-container',
+  width: 960,
+  height: 540,
+  backgroundColor: '#000000',
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 0 },
       debug: false
     }
   },
-
-scene: [
-  BootScene,
-  PreloadScene,
-  MenuScene,
-  LobbyScene,
-  BoardScene,
-  GameScene
-]
-
+  scene: [
+    BootScene,
+    PreloadScene,
+    MenuScene,
+    LobbyScene,
+    BoardScene,
+    GameScene
+  ]
 };
 
-const game = new Phaser.Game(config);
+window.addEventListener('load', () => {
+  new Phaser.Game(config);
+});
