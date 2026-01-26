@@ -25,7 +25,6 @@ class MenuScene extends Phaser.Scene {
       fill: '#ffffff'
     }).setOrigin(0.5);
 
-    // Création d’un input HTML par-dessus le canvas
     this.nameInput = document.createElement('input');
     this.nameInput.type = 'text';
     this.nameInput.placeholder = 'Ex : SuperBonobo';
@@ -38,21 +37,16 @@ class MenuScene extends Phaser.Scene {
     this.nameInput.style.padding = '6px';
     this.nameInput.style.borderRadius = '6px';
     this.nameInput.style.border = '2px solid #ffaa33';
-    this.nameInput.style.outline = 'none';
-    this.nameInput.style.textAlign = 'center';
     this.nameInput.style.background = '#fff8e0';
+    this.nameInput.style.textAlign = 'center';
     this.nameInput.style.zIndex = 1000;
 
     document.body.appendChild(this.nameInput);
 
-    // --- Bouton jouer ---
     const playBtn = this.add.text(width / 2, height - 120, '[ Rejoindre la jungle ]', {
       fontSize: '28px',
       fill: '#ffdd55'
     }).setOrigin(0.5).setInteractive();
-
-    playBtn.on('pointerover', () => playBtn.setFill('#ffee88'));
-    playBtn.on('pointerout', () => playBtn.setFill('#ffdd55'));
 
     playBtn.on('pointerdown', () => {
       const pseudo = this.nameInput.value.trim();
@@ -62,12 +56,18 @@ class MenuScene extends Phaser.Scene {
         return;
       }
 
-      // Sauvegarde du pseudo dans le registry
+      // Sauvegarde du pseudo
       this.registry.set('playerName', pseudo);
 
-      // Supprimer l’input HTML
-      this.nameInput.remove();
+      // ID persistant
+      let savedId = localStorage.getItem('bonoboPlayerId');
+      if (!savedId) {
+        savedId = randomId();
+        localStorage.setItem('bonoboPlayerId', savedId);
+      }
+      this.registry.set('savedId', savedId);
 
+      this.nameInput.remove();
       this.scene.start('LobbyScene');
     });
   }
