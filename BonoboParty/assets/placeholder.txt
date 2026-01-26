@@ -9,56 +9,56 @@ Fond & plateau
 
 assets/bg_jungle.png → grand fond jungle (1920×1080 par ex.)
 
-assets/board_path.png → le plateau vu de dessus (chemin de cases)
+assets/board_path.png → le plateau vu de dessus (chemin de cases) 1500x300
 
 Cases
 
-assets/tile_normal.png
+assets/tile_normal.png 80x80
 
-assets/tile_bonus.png
+assets/tile_bonus.png 80x80
 
-assets/tile_malus.png
+assets/tile_malus.png 80x80
 
-assets/tile_item.png
+assets/tile_item.png 80x80
 
 Joueurs
 
-assets/bonobo_idle.png → spritesheet idle (par ex. 4 frames)
+assets/bonobo_idle.png → spritesheet idle (par ex. 4 frames) 64x64
 
-assets/bonobo_walk.png → spritesheet marche (8 frames)
+assets/bonobo_walk.png → spritesheet marche (8 frames) 64x64
 
 Objets
 
-assets/item_banana.png
+assets/item_banana.png 64x64
 
-assets/item_shield.png
+assets/item_shield.png 64x64
 
-assets/item_golden_dice.png
+assets/item_golden_dice.png 64x64
 
 UI
 
-assets/ui_button.png
+assets/ui_button.png 200x80
 
-assets/ui_panel.png
+assets/ui_panel.png 400x300
 
 
 ============== MINI JEU ====================
 
 🎨 Fond & décor
-mg_bg_jungle.png → fond jungle horizontal
+mg_bg_jungle.png → fond jungle horizontal 1920x1080
 
-mg_finish.png → ligne d’arrivée
+mg_finish.png → ligne d’arrivée 300x80
 
 🪨 Obstacles
-mg_rock.png → rocher cartoon
+mg_rock.png → rocher cartoon 80x80
 
-mg_trunk.png → tronc d’arbre
+mg_trunk.png → tronc d’arbre 120x60
 
 🍌 Bonus
-mg_banana.png → banane brillante (boost)
+mg_banana.png → banane brillante (boost) 64x64
 
 🐒 Joueur animé
-mg_bonobo_run.png → spritesheet 8 frames (course)
+mg_bonobo_run.png → spritesheet 8 frames (course) 64x64
 
 🔊 Sons
 mg_hit.wav → bruit d’impact
@@ -67,6 +67,6 @@ mg_boost.wav → bruit de boost
 
 
 ============= leaderboard ===================
-pdium.png
-confetti.png
+pdium.png 600x400
+confetti.png 32x32
 victory_music.mp3
