@@ -24,10 +24,15 @@ function getRoomRef(roomCode) {
   return db.ref('rooms/' + roomCode);
 }
 
-// 🔥 Reconnexion automatique + anti-doublons
 function createOrJoinRoom(playerName, savedId, callback) {
   const roomCode = 'BONOBO';
   const roomRef = getRoomRef(roomCode);
+
+  // 🔥 Sécurisation : savedId doit toujours être valide
+  if (!savedId || typeof savedId !== "string" || savedId.length < 2) {
+    savedId = randomId();
+    localStorage.setItem("bonoboPlayerId", savedId);
+  }
 
   roomRef.transaction(room => {
     if (!room) {
@@ -76,6 +81,7 @@ function createOrJoinRoom(playerName, savedId, callback) {
     });
   });
 }
+
 
 function listenRoom(roomRef, callback) {
   roomRef.on('value', snapshot => {
