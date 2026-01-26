@@ -14,7 +14,7 @@ class LobbyScene extends Phaser.Scene {
       fill: '#ffffff'
     }).setOrigin(0.5);
 
-    this.statusText = this.add.text(width / 2, 100, 'Connexion à la jungle...', {
+    this.statusText = this.add.text(width / 2, 100, 'Connexion...', {
       fontSize: '18px',
       fill: '#ffdd88'
     }).setOrigin(0.5);
@@ -25,16 +25,17 @@ class LobbyScene extends Phaser.Scene {
       align: 'center'
     }).setOrigin(0.5);
 
-   const name = this.registry.get('playerName') || 'Joueur';
+    const name = this.registry.get('playerName');
+    const savedId = this.registry.get('savedId');
 
-    createOrJoinRoom(name, (roomRef, playerId) => {
+    createOrJoinRoom(name, savedId, (roomRef, playerId) => {
       this.roomRef = roomRef;
       this.playerId = playerId;
 
       this.registry.set('roomRef', roomRef);
       this.registry.set('playerId', playerId);
 
-      this.statusText.setText('En attente de joueurs (2 à 4)...');
+      this.statusText.setText('En attente de joueurs...');
 
       listenRoom(roomRef, data => this.updateLobby(data));
     });
@@ -53,7 +54,6 @@ class LobbyScene extends Phaser.Scene {
 
     this.playersText.setText(txt);
 
-    // Bouton prêt
     if (!this.readyButton) {
       const width = this.cameras.main.width;
       const height = this.cameras.main.height;
@@ -68,10 +68,9 @@ class LobbyScene extends Phaser.Scene {
       });
     }
 
-    // Quand 2 à 4 joueurs et tous prêts → on lance la partie
     const readyCount = players.filter(([_, p]) => p.ready).length;
 
-    if (count >= 2 && count <= 4 && readyCount === count && data.state === 'lobby') {
+    if (count >= 2 && readyCount === count && data.state === 'lobby') {
       const order = players.map(([id]) => id);
       this.roomRef.child('turnOrder').set(order);
       this.roomRef.child('turnIndex').set(0);
