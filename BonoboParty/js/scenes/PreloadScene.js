@@ -39,7 +39,7 @@ class PreloadScene extends Phaser.Scene {
     // --- MOUFLE ---
     this.moufle = this.add.container(centerX + 40, groundY);
     this.moufle.add([
-      this.add.rectangle(0, 0, 40, 50, 0xb02040).setOrigin(0.5, 1)
+      this.add.rectangle(0, 0, 40, 50, 0xb02040).setOrigin(0.5, 1),
       this.add.circle(-18, -20, 12, 0xb02040)
     ]);
 
