@@ -13,41 +13,46 @@ class GameScene extends Phaser.Scene {
     this.finishX = width - 120;
     this.gameFinished = false;
 
-    this.cameras.main.setBackgroundColor('#123018');
+    // --- Fond jungle animé ---
+    const bg = this.add.image(width / 2, height / 2, 'mg_bg_jungle');
+    bg.setDisplaySize(width, height);
 
-    this.add.rectangle(width / 2, height - 40, width, 80, 0x3b2a1a);
+    this.tweens.add({
+      targets: bg,
+      x: width / 2 + 20,
+      duration: 2000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
 
-    this.add.rectangle(this.finishX, height / 2, 16, height, 0xffdd55);
-    this.add.text(this.finishX, 40, 'ARRIVÉE', {
-      fontSize: '20px',
-      fill: '#ffdd55'
-    }).setOrigin(0.5);
+    // --- Ligne d'arrivée ---
+    this.add.image(this.finishX, height / 2, 'mg_finish')
+      .setScale(1.2)
+      .setDepth(2);
 
     this.add.text(width / 2, 40, 'Course aux Noix', {
       fontSize: '32px',
-      fill: '#ffffff'
+      fill: '#ffffff',
+      stroke: '#000',
+      strokeThickness: 4
     }).setOrigin(0.5);
 
     this.infoText = this.add.text(width / 2, height - 80, 'Clique pour courir !', {
       fontSize: '20px',
-      fill: '#ffddaa'
+      fill: '#ffddaa',
+      stroke: '#000',
+      strokeThickness: 3
     }).setOrigin(0.5);
 
-    this.banana = this.add.container(width / 2, 120);
-    const glow = this.add.circle(0, 0, 40, 0xffffaa, 0.4);
-    const bananaShape = this.add.arc(0, 0, 20, 200, 340, false)
-      .setStrokeStyle(8, 0xf7d64a);
-    this.banana.add([glow, bananaShape]);
-    this.banana.setAlpha(0.8);
-
-    this.players = {};
+    // --- Obstacles ---
     this.obstacles = [];
-
     this.spawnObstacles();
 
-    listenRoom(this.roomRef, data => this.syncFromFirebase(data));
-
-    this.input.on('pointerdown', () => this.handleClick());
+    // --- Bonus banane ---
+    this.banana = this.add.image(width / 2, 120, 'mg_banana')
+      .setScale(0.8)
+      .setDepth(3);
 
     this.tweens.add({
       targets: this.banana,
@@ -57,17 +62,33 @@ class GameScene extends Phaser.Scene {
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
+
+    // --- Joueurs ---
+    this.players = {};
+
+    listenRoom(this.roomRef, data => this.syncFromFirebase(data));
+
+    // --- Input ---
+    this.input.on('pointerdown', () => this.handleClick());
   }
 
   spawnObstacles() {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
+    const obstacleKeys = ['mg_rock', 'mg_trunk'];
+
     for (let i = 0; i < 3; i++) {
       const x = Phaser.Math.Between(300, width - 200);
       const y = 200 + i * 80;
-      const rock = this.add.circle(x, y, 20, 0x4a3a2a);
-      this.obstacles.push(rock);
+
+      const key = Phaser.Math.RND.pick(obstacleKeys);
+
+      const obs = this.add.image(x, y, key)
+        .setScale(1.1)
+        .setDepth(2);
+
+      this.obstacles.push(obs);
     }
   }
 
@@ -77,6 +98,7 @@ class GameScene extends Phaser.Scene {
     const spacing = 80;
     let index = 0;
 
+    // Retour au plateau
     if (data.state === 'board' && this.gameFinished) {
       this.scene.start('BoardScene');
       return;
@@ -85,37 +107,30 @@ class GameScene extends Phaser.Scene {
     for (const [id, p] of Object.entries(data.players)) {
       if (!this.players[id]) {
         const y = 200 + index * spacing;
-        const container = this.createBonobo(100, y, p.name || id);
-        this.players[id] = { container, data: p };
+
+        const bonobo = this.add.sprite(100, y, 'mg_bonobo_run')
+          .setScale(1.3)
+          .setDepth(3);
+
+        bonobo.play('mg_bonobo_run_anim');
+
+        const nameText = this.add.text(100, y + 40, p.name, {
+          fontSize: '16px',
+          fill: '#ffffff',
+          stroke: '#000',
+          strokeThickness: 3
+        }).setOrigin(0.5);
+
+        this.players[id] = { sprite: bonobo, nameText, data: p };
       }
 
       const player = this.players[id];
-      player.container.x = p.x || 100;
+      player.sprite.x = p.x || 100;
+      player.nameText.x = p.x || 100;
       player.data = p;
 
       index++;
     }
-  }
-
-  createBonobo(x, y, name) {
-    const container = this.add.container(x, y);
-
-    const body = this.add.rectangle(0, 10, 40, 50, 0x5b3b24).setOrigin(0.5, 1);
-    const head = this.add.circle(0, -30, 18, 0x5b3b24);
-    const face = this.add.ellipse(0, -25, 26, 20, 0xc48a5a);
-    const eyeL = this.add.circle(-6, -30, 4, 0xffffff);
-    const eyeR = this.add.circle(6, -30, 4, 0xffffff);
-    const pupilL = this.add.circle(-6, -30, 2, 0x000000);
-    const pupilR = this.add.circle(6, -30, 2, 0x000000);
-
-    const nameText = this.add.text(0, 40, name, {
-      fontSize: '14px',
-      fill: '#ffffff'
-    }).setOrigin(0.5);
-
-    container.add([body, head, face, eyeL, eyeR, pupilL, pupilR, nameText]);
-
-    return container;
   }
 
   handleClick() {
@@ -124,29 +139,34 @@ class GameScene extends Phaser.Scene {
     const player = this.players[this.playerId];
     if (!player) return;
 
-    const currentX = player.container.x;
+    const currentX = player.sprite.x;
 
-    const hitObstacle = this.obstacles.some(obs => Math.abs(obs.x - currentX) < 30);
+    // Collision obstacle
+    const hitObstacle = this.obstacles.some(obs => Math.abs(obs.x - currentX) < 40);
 
     let boost = Phaser.Math.Between(10, 25);
 
     if (hitObstacle) {
       boost = -10;
+      this.sound.play('mg_hit');
       this.infoText.setText('Aïe ! Un obstacle !');
     } else {
       this.infoText.setText('Clique pour courir !');
     }
 
+    // Boost rare
     if (Phaser.Math.Between(1, 20) === 1) {
       boost = 50;
+      this.sound.play('mg_boost');
       this.cameras.main.flash(200, 255, 255, 100);
     }
 
     const newX = currentX + boost;
 
+    // Petit saut
     this.tweens.add({
-      targets: player.container,
-      y: player.container.y - 10,
+      targets: player.sprite,
+      y: player.sprite.y - 10,
       duration: 100,
       yoyo: true
     });
@@ -173,11 +193,13 @@ class GameScene extends Phaser.Scene {
 
       updatePlayer(this.roomRef, this.playerId, { rank });
 
+      // Points
       if (rank === 1) addScore(this.roomRef, this.playerId, 3);
       if (rank === 2) addScore(this.roomRef, this.playerId, 2);
       if (rank === 3) addScore(this.roomRef, this.playerId, 1);
 
       const totalPlayers = Object.keys(data.players).length;
+
       if (finishedPlayers.length === totalPlayers) {
         this.gameFinished = true;
         setRoomState(this.roomRef, 'board');
@@ -190,14 +212,19 @@ class GameScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
-    const panel = this.add.rectangle(width / 2, height / 2, 500, 300, 0x2b1a10, 0.95);
-    panel.setStrokeStyle(2, 0xffdd55);
+    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7)
+      .setDepth(10);
+
+    const panel = this.add.image(width / 2, height / 2, 'ui_panel')
+      .setScale(1.4)
+      .setDepth(11);
 
     this.add.text(width / 2, height / 2 - 120, 'Résultats de la course', {
       fontSize: '28px',
-      fill: '#ffdd55'
-    }).setOrigin(0.5);
+      fill: '#ffdd55',
+      stroke: '#000',
+      strokeThickness: 4
+    }).setOrigin(0.5).setDepth(12);
 
     const players = Object.entries(data.players);
     const sorted = players
@@ -209,22 +236,23 @@ class GameScene extends Phaser.Scene {
       if (p.rank === 1) place = '1er';
       if (p.rank === 2) place = '2e';
       if (p.rank === 3) place = '3e';
-      return `${place} - ${p.name || id} (+${p.rank === 1 ? 3 : p.rank === 2 ? 2 : 1} pts)`;
+      return `${place} - ${p.name}`;
     });
 
-    this.add.text(width / 2, height / 2 - 40, lines.join('\n'), {
+    this.add.text(width / 2, height / 2 - 20, lines.join('\n'), {
       fontSize: '22px',
       fill: '#ffffff',
-      align: 'center'
-    }).setOrigin(0.5);
+      align: 'center',
+      stroke: '#000',
+      strokeThickness: 3
+    }).setOrigin(0.5).setDepth(12);
 
-    const backText = this.add.text(width / 2, height / 2 + 100, '[ Retour à la Jungle ]', {
+    const backText = this.add.text(width / 2, height / 2 + 120, '[ Retour au plateau ]', {
       fontSize: '20px',
-      fill: '#ffdd55'
-    }).setOrigin(0.5).setInteractive();
-
-    backText.on('pointerover', () => backText.setFill('#ffee88'));
-    backText.on('pointerout', () => backText.setFill('#ffdd55'));
+      fill: '#ffdd55',
+      stroke: '#000',
+      strokeThickness: 3
+    }).setOrigin(0.5).setDepth(12).setInteractive();
 
     backText.on('pointerdown', () => {
       this.scene.start('BoardScene');
