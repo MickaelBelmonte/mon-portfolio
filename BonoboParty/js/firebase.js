@@ -1,14 +1,8 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Configuration Firebase (MET TON databaseURL ici)
 const firebaseConfig = {
   apiKey: "AIzaSyDgj0Rc_XL07EU8qEzHQmaCoz_bGg2HMxU",
   authDomain: "bonobo-party.firebaseapp.com",
+  databaseURL: "https://bonobo-party-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "bonobo-party",
   storageBucket: "bonobo-party.firebasestorage.app",
   messagingSenderId: "193175412938",
@@ -16,14 +10,11 @@ const firebaseConfig = {
   measurementId: "G-RFRLSC5HMQ"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
+// Initialisation Firebase (compat)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Code Room
+// Génération d’un code de room
 function generateRoomCode(length = 5) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
@@ -47,7 +38,7 @@ async function createRoom() {
   return { roomCode, roomRef };
 }
 
-// Rejoindre une room existante
+// Rejoindre une room
 async function joinRoom(roomCode) {
   const roomRef = db.ref('rooms/' + roomCode);
   const snapshot = await roomRef.get();
@@ -66,15 +57,14 @@ async function joinRoom(roomCode) {
   return { roomRef, playerId };
 }
 
-// Écouter les changements de la room
+// Écouter la room en temps réel
 function listenRoom(roomRef, callback) {
   roomRef.on('value', (snapshot) => {
-    const data = snapshot.val();
-    callback(data);
+    callback(snapshot.val());
   });
 }
 
-// Mettre à jour l’état d’un joueur
+// Mettre un joueur en "prêt"
 function setPlayerReady(roomRef, playerId, ready) {
   return roomRef.child('players/' + playerId + '/ready').set(ready);
 }
