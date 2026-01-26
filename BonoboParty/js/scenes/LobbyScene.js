@@ -25,7 +25,7 @@ class LobbyScene extends Phaser.Scene {
       align: 'center'
     }).setOrigin(0.5);
 
-    const name = 'Joueur ' + Math.floor(Math.random() * 1000);
+   const name = this.registry.get('playerName') || 'Joueur';
 
     createOrJoinRoom(name, (roomRef, playerId) => {
       this.roomRef = roomRef;
