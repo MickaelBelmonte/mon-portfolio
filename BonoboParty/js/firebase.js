@@ -24,9 +24,9 @@ function getRoomRef(roomCode) {
   return db.ref('rooms/' + roomCode);
 }
 
-// Crée ou rejoint une room (2 à 4 joueurs)
-function createOrJoinRoom(playerName, callback) {
-  const roomCode = 'BONOBO'; // simple : une seule room pour l’instant
+// 🔥 Reconnexion automatique + anti-doublons
+function createOrJoinRoom(playerName, savedId, callback) {
+  const roomCode = 'BONOBO';
   const roomRef = getRoomRef(roomCode);
 
   roomRef.transaction(room => {
@@ -43,34 +43,37 @@ function createOrJoinRoom(playerName, callback) {
 
     const room = snapshot.val();
     const players = room.players || {};
-    const playerCount = Object.keys(players).length;
 
-    if (playerCount >= 4) {
-      alert('La room est pleine (max 4 joueurs).');
+    // 🔥 Reconnexion : si le joueur existe déjà
+    if (players[savedId]) {
+      callback(roomRef, savedId);
       return;
     }
 
-    const playerId = randomId();
+    // Sinon → nouveau joueur
+    const playerId = savedId;
     const playerRef = roomRef.child('players/' + playerId);
 
-playerRef.set({
-  name: playerName,
-  ready: false,
-  score: 0,
-  tile: 0,
-  x: 100,
-  finished: false,
-  rank: null,
-  items: {
-    bananaBoost: 0,
-    shield: 0,
-    goldenDice: 0
-  }
-}).then(() => {
-  playerRef.onDisconnect().remove();
+    playerRef.set({
+      name: playerName,
+      ready: false,
+      score: 0,
+      tile: 0,
+      x: 100,
+      finished: false,
+      rank: null,
+      items: {
+        bananaBoost: 0,
+        shield: 0,
+        goldenDice: 0
+      }
+    }).then(() => {
 
-  callback(roomRef, playerId);
-});
+      // 🔥 Déconnexion automatique si l’onglet se ferme
+      playerRef.onDisconnect().remove();
+
+      callback(roomRef, playerId);
+    });
   });
 }
 
