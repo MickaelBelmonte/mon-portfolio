@@ -5,15 +5,13 @@ const config = {
   backgroundColor: '#1a2f1a',
   physics: {
     default: 'arcade',
-    arcade: {
-      gravity: { y: 0 },
-      debug: false
-    }
+    arcade: { gravity: { y: 0 }, debug: false }
   },
   scene: [
     BootScene,
     PreloadScene,
-    MenuScene
+    MenuScene,
+    GameScene
   ]
 };
 
