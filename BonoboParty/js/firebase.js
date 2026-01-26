@@ -1,4 +1,4 @@
-// Configuration Firebase (MET TON databaseURL ici)
+// Configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDgj0Rc_XL07EU8qEzHQmaCoz_bGg2HMxU",
   authDomain: "bonobo-party.firebaseapp.com",
@@ -14,7 +14,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Génération d’un code de room
+/* ---------------------------------------------------------
+   Génération d’un code de room
+--------------------------------------------------------- */
 function generateRoomCode(length = 5) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
@@ -24,10 +26,18 @@ function generateRoomCode(length = 5) {
   return code;
 }
 
-// Créer une room
+/* ---------------------------------------------------------
+   Créer une room
+--------------------------------------------------------- */
 async function createRoom() {
   const roomCode = generateRoomCode();
   const roomRef = db.ref('rooms/' + roomCode);
+
+  // Sécurité : si la room existe déjà (rare), on en génère une autre
+  const snapshot = await roomRef.get();
+  if (snapshot.exists()) {
+    return createRoom(); // récursion simple
+  }
 
   await roomRef.set({
     createdAt: Date.now(),
@@ -38,7 +48,9 @@ async function createRoom() {
   return { roomCode, roomRef };
 }
 
-// Rejoindre une room
+/* ---------------------------------------------------------
+   Rejoindre une room
+--------------------------------------------------------- */
 async function joinRoom(roomCode) {
   const roomRef = db.ref('rooms/' + roomCode);
   const snapshot = await roomRef.get();
@@ -51,20 +63,48 @@ async function joinRoom(roomCode) {
 
   await roomRef.child('players/' + playerId).set({
     joinedAt: Date.now(),
-    ready: false
+    ready: false,
+    x: 0,      // utile pour les mini‑jeux
+    y: 0,
+    score: 0
   });
 
   return { roomRef, playerId };
 }
 
-// Écouter la room en temps réel
+/* ---------------------------------------------------------
+   Écouter la room en temps réel
+--------------------------------------------------------- */
 function listenRoom(roomRef, callback) {
   roomRef.on('value', (snapshot) => {
     callback(snapshot.val());
   });
 }
 
-// Mettre un joueur en "prêt"
+/* ---------------------------------------------------------
+   Mettre un joueur en "prêt"
+--------------------------------------------------------- */
 function setPlayerReady(roomRef, playerId, ready) {
   return roomRef.child('players/' + playerId + '/ready').set(ready);
+}
+
+/* ---------------------------------------------------------
+   Mettre à jour un joueur (position, score…)
+--------------------------------------------------------- */
+function updatePlayer(roomRef, playerId, data) {
+  return roomRef.child('players/' + playerId).update(data);
+}
+
+/* ---------------------------------------------------------
+   Changer l’état global de la room
+--------------------------------------------------------- */
+function setRoomState(roomRef, state) {
+  return roomRef.child('state').set(state);
+}
+
+/* ---------------------------------------------------------
+   Quitter une room
+--------------------------------------------------------- */
+function leaveRoom(roomRef, playerId) {
+  return roomRef.child('players/' + playerId).remove();
 }
