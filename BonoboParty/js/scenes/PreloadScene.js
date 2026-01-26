@@ -31,7 +31,9 @@ class PreloadScene extends Phaser.Scene {
       this.add.circle(8, -30, 5, 0xffffff),
       this.add.circle(-8, -30, 2, 0x000000),
       this.add.circle(8, -30, 2, 0x000000),
-      this.add.arc(20, 0, 18, 180, 320, false, 0x5b3b24).setLineWidth(4)
+
+      this.add.arc(20, 0, 18, 180, 320, false)
+        .setStrokeStyle(4, 0x5b3b24)
     ]);
 
     // --- MOUFLE ---
@@ -45,7 +47,9 @@ class PreloadScene extends Phaser.Scene {
     this.banana = this.add.container(centerX - 150, groundY - 120);
     this.banana.add([
       this.add.circle(0, 0, 40, 0xffffaa, 0.4),
-      this.add.arc(0, 0, 20, 200, 340, false, 0xf7d64a).setLineWidth(8)
+
+      this.add.arc(0, 0, 20, 200, 340, false)
+        .setStrokeStyle(8, 0xf7d64a)
     ]);
     this.banana.setAlpha(0);
 
