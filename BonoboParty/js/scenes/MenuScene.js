@@ -16,8 +16,11 @@ class MenuScene extends Phaser.Scene {
 
     this.input.once('pointerdown', () => {
       console.log('Le jeu va commencer ici');
-      // Tu lanceras ta première scène de jeu :
-      // this.scene.start('GameScene');
+
+      this.input.once('pointerdown', () => {
+  this.scene.start('GameScene');
+});
+
     });
   }
 }
