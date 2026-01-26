@@ -40,3 +40,27 @@ UI
 assets/ui_button.png
 
 assets/ui_panel.png
+
+
+============== MINI JEU ====================
+
+🎨 Fond & décor
+mg_bg_jungle.png → fond jungle horizontal
+
+mg_finish.png → ligne d’arrivée
+
+🪨 Obstacles
+mg_rock.png → rocher cartoon
+
+mg_trunk.png → tronc d’arbre
+
+🍌 Bonus
+mg_banana.png → banane brillante (boost)
+
+🐒 Joueur animé
+mg_bonobo_run.png → spritesheet 8 frames (course)
+
+🔊 Sons
+mg_hit.wav → bruit d’impact
+
+mg_boost.wav → bruit de boost
