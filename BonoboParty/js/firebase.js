@@ -69,6 +69,7 @@ function createOrJoinRoom(playerName, callback) {
     }).then(() => {
       callback(roomRef, playerId);
     });
+playerRef.onDisconnect().remove();
   });
 }
 
