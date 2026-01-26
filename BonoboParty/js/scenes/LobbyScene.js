@@ -25,6 +25,7 @@ class LobbyScene extends Phaser.Scene {
       align: 'center'
     }).setOrigin(0.5);
 
+    // 🔥 Récupération pseudo + ID persistant
     const name = this.registry.get('playerName');
     const savedId = this.registry.get('savedId');
 
@@ -82,3 +83,4 @@ class LobbyScene extends Phaser.Scene {
     }
   }
 }
+
