@@ -63,6 +63,14 @@ class PreloadScene extends Phaser.Scene {
     // Animations
     this.animateCharacters();
 
+    // SONS
+
+    this.load.audio('boardMusic', 'assets/board_music.mp3');
+    this.load.audio('diceSound', 'assets/dice.wav');
+    this.load.audio('bonusSound', 'assets/bonus.wav');
+    this.load.audio('malusSound', 'assets/malus.wav');
+
+
     // Progression
     this.progress = 0;
     this.time.addEvent({
