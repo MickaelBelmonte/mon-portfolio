@@ -10,112 +10,83 @@ const firebaseConfig = {
   measurementId: "G-RFRLSC5HMQ"
 };
 
-// Initialisation Firebase (compat)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-/* ---------------------------------------------------------
-   Génération d’un code de room
---------------------------------------------------------- */
-function generateRoomCode(length = 5) {
+function randomId(len = 6) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < length; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
+  let out = '';
+  for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
 }
 
-/* ---------------------------------------------------------
-   Créer une room
---------------------------------------------------------- */
-async function createRoom() {
-  const roomCode = generateRoomCode();
-  const roomRef = db.ref('rooms/' + roomCode);
+function getRoomRef(roomCode) {
+  return db.ref('rooms/' + roomCode);
+}
 
-  // Sécurité : si la room existe déjà (rare), on en génère une autre
-  const snapshot = await roomRef.get();
-  if (snapshot.exists()) {
-    return createRoom(); // récursion simple
-  }
+// Crée ou rejoint une room (2 à 4 joueurs)
+function createOrJoinRoom(playerName, callback) {
+  const roomCode = 'BONOBO'; // simple : une seule room pour l’instant
+  const roomRef = getRoomRef(roomCode);
 
-  await roomRef.set({
-    createdAt: Date.now(),
-    state: 'waiting',
-    players: {}
+  roomRef.transaction(room => {
+    if (!room) {
+      room = {
+        code: roomCode,
+        state: 'lobby',
+        players: {}
+      };
+    }
+    return room;
+  }, (err, committed, snapshot) => {
+    if (!committed || !snapshot) return;
+
+    const room = snapshot.val();
+    const players = room.players || {};
+    const playerCount = Object.keys(players).length;
+
+    if (playerCount >= 4) {
+      alert('La room est pleine (max 4 joueurs).');
+      return;
+    }
+
+    const playerId = randomId();
+    const playerRef = roomRef.child('players/' + playerId);
+
+    playerRef.set({
+      name: playerName || ('Joueur ' + playerId),
+      ready: false,
+      score: 0,
+      tile: 0,
+      x: 100,
+      finished: false,
+      rank: null,
+      items: {
+        bananaBoost: 0,
+        shield: 0,
+        goldenDice: 0
+      }
+    }).then(() => {
+      callback(roomRef, playerId);
+    });
   });
-
-  return { roomCode, roomRef };
 }
 
-/* ---------------------------------------------------------
-   Rejoindre une room
---------------------------------------------------------- */
-async function joinRoom(roomCode) {
-  const roomRef = db.ref('rooms/' + roomCode);
-  const snapshot = await roomRef.get();
-
-  if (!snapshot.exists()) {
-    throw new Error('Room introuvable');
-  }
-
-  const playerId = 'player_' + Math.floor(Math.random() * 1000000);
-
-  await roomRef.child('players/' + playerId).set({
-    joinedAt: Date.now(),
-    ready: false,
-    x: 0,      // utile pour les mini‑jeux
-    y: 0,
-    score: 0
-  });
-
-  return { roomRef, playerId };
-}
-
-/* ---------------------------------------------------------
-   Écouter la room en temps réel
---------------------------------------------------------- */
 function listenRoom(roomRef, callback) {
-  roomRef.on('value', (snapshot) => {
+  roomRef.on('value', snapshot => {
     callback(snapshot.val());
   });
 }
 
-/* ---------------------------------------------------------
-   Mettre un joueur en "prêt"
---------------------------------------------------------- */
-function setPlayerReady(roomRef, playerId, ready) {
-  return roomRef.child('players/' + playerId + '/ready').set(ready);
-}
-
-/* ---------------------------------------------------------
-   Mettre à jour un joueur (position, score…)
---------------------------------------------------------- */
 function updatePlayer(roomRef, playerId, data) {
   return roomRef.child('players/' + playerId).update(data);
 }
 
-/* ---------------------------------------------------------
-   Changer l’état global de la room
---------------------------------------------------------- */
 function setRoomState(roomRef, state) {
   return roomRef.child('state').set(state);
 }
 
-/* ---------------------------------------------------------
-   CLASSEMENT
---------------------------------------------------------- */
-
 function addScore(roomRef, playerId, amount) {
-  return roomRef.child('players/' + playerId + '/score').transaction(score => {
-    return (score || 0) + amount;
-  });
-}
-
-
-/* ---------------------------------------------------------
-   Quitter une room
---------------------------------------------------------- */
-function leaveRoom(roomRef, playerId) {
-  return roomRef.child('players/' + playerId).remove();
+  const ref = roomRef.child('players/' + playerId + '/score');
+  return ref.transaction(score => (score || 0) + amount);
 }
