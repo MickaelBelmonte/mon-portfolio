@@ -59,12 +59,14 @@ class MenuScene extends Phaser.Scene {
       // Sauvegarde du pseudo
       this.registry.set('playerName', pseudo);
 
-      // ID persistant
+      // ID persistant sécurisé
       let savedId = localStorage.getItem('bonoboPlayerId');
-      if (!savedId) {
+
+      if (!savedId || typeof savedId !== "string" || savedId.length < 2) {
         savedId = randomId();
         localStorage.setItem('bonoboPlayerId', savedId);
       }
+
       this.registry.set('savedId', savedId);
 
       this.nameInput.remove();
@@ -76,3 +78,4 @@ class MenuScene extends Phaser.Scene {
     if (this.nameInput) this.nameInput.remove();
   }
 }
+
