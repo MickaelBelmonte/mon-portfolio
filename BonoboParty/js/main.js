@@ -16,7 +16,8 @@ const config = {
     MenuScene,
     LobbyScene,
     BoardScene,
-    GameScene
+    GameScene,
+    EndScene
   ]
 };
 
