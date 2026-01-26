@@ -10,10 +10,13 @@ class BoardScene extends Phaser.Scene {
     this.roomRef = this.registry.get('roomRef');
     this.playerId = this.registry.get('playerId');
 
-    this.cameras.main.setBackgroundColor('#0e2a12');
+    // Fond jungle
+    const bg = this.add.image(width / 2, height / 2, 'bg_jungle');
+    bg.setDisplaySize(width, height);
 
-    this.music = this.sound.add('boardMusic', { loop: true, volume: 0.4 });
-    this.music.play();
+    // Plateau (chemin)
+    const board = this.add.image(width / 2, height / 2, 'board_path');
+    board.setOrigin(0.5);
 
     this.tiles = [];
     this.bonusTiles = [2, 7];
@@ -22,59 +25,86 @@ class BoardScene extends Phaser.Scene {
 
     const tileSize = 80;
     const startX = 120;
-    const y = height / 2;
+    const y = height / 2 + 40; // léger décalage
 
+    // Cases avec sprites
     for (let i = 0; i < 12; i++) {
       const x = startX + i * tileSize;
-      const tile = this.add.rectangle(x, y, tileSize - 10, tileSize - 10, 0x3b2a1a);
-      tile.setStrokeStyle(2, 0xffffff);
+
+      let key = 'tile_normal';
+      if (this.bonusTiles.includes(i)) key = 'tile_bonus';
+      if (this.malusTiles.includes(i)) key = 'tile_malus';
+      if (this.itemTiles.includes(i)) key = 'tile_item';
+
+      const tile = this.add.image(x, y, key).setScale(0.9);
+      tile.setDepth(1);
       this.tiles.push(tile);
     }
-
-    this.bonusTiles.forEach(i => this.tiles[i].setFillStyle(0x55aa55));
-    this.malusTiles.forEach(i => this.tiles[i].setFillStyle(0xaa5555));
-    this.itemTiles.forEach(i => this.tiles[i].setFillStyle(0x5555aa));
 
     this.add.text(width / 2, 80, 'Plateau Bonobo', {
       fontSize: '32px',
       fill: '#ffffff'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(5);
 
     this.turnText = this.add.text(width / 2, 130, '', {
       fontSize: '20px',
       fill: '#ffdd88'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(5);
 
-    // --- Timer de tour ---
-    this.turnTime = 20;          // secondes par tour
+    // Timer si tu veux le garder
+    this.turnTime = 20;
     this.turnTimer = null;
     this.remainingTime = 0;
     this.timerText = this.add.text(width - 120, 40, '', {
       fontSize: '26px',
       fill: '#ffdd55'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(5);
+
+    this.music = this.sound.add('boardMusic', { loop: true, volume: 0.4 });
+    this.music.play();
 
     this.players = {};
     this.currentTurn = null;
     this.activeItem = null;
 
-    this.rollButton = this.add.text(width / 2, height - 80, '[ Lancer le dé ]', {
-      fontSize: '26px',
-      fill: '#ffdd55'
-    }).setOrigin(0.5);
-    this.rollButton.setAlpha(0.5);
-    this.rollButton.disableInteractive();
-
-    this.rollButton.on('pointerdown', () => this.rollDice());
-
-    this.itemButton = this.add.text(120, height - 80, '[ Objets ]', {
+    // Bouton lancer dé (UI image + texte)
+    const rollBtnImg = this.add.image(width / 2, height - 80, 'ui_button').setScale(1.2).setDepth(5);
+    this.rollButton = this.add.text(rollBtnImg.x, rollBtnImg.y, 'Lancer le dé', {
       fontSize: '22px',
-      fill: '#ffdd55'
-    }).setOrigin(0.5).setInteractive();
+      fill: '#000000'
+    }).setOrigin(0.5).setDepth(6);
 
-    this.itemButton.on('pointerdown', () => this.openItemMenu());
+    rollBtnImg.setInteractive();
+    rollBtnImg.on('pointerdown', () => this.rollDice());
+
+    this.rollBtnImg = rollBtnImg;
+    this.setRollButtonEnabled(false);
+
+    // Bouton objets
+    const itemBtnImg = this.add.image(140, height - 80, 'ui_button').setScale(0.9).setDepth(5);
+    this.itemButton = this.add.text(itemBtnImg.x, itemBtnImg.y, 'Objets', {
+      fontSize: '20px',
+      fill: '#000000'
+    }).setOrigin(0.5).setDepth(6);
+
+    itemBtnImg.setInteractive();
+    itemBtnImg.on('pointerdown', () => this.openItemMenu());
+
+    this.itemBtnImg = itemBtnImg;
 
     listenRoom(this.roomRef, data => this.syncFromFirebase(data));
+  }
+
+  setRollButtonEnabled(enabled) {
+    if (enabled) {
+      this.rollBtnImg.setAlpha(1);
+      this.rollBtnImg.setInteractive();
+      this.rollButton.setAlpha(1);
+    } else {
+      this.rollBtnImg.setAlpha(0.4);
+      this.rollBtnImg.disableInteractive();
+      this.rollButton.setAlpha(0.4);
+    }
   }
 
   syncFromFirebase(data) {
@@ -92,29 +122,29 @@ class BoardScene extends Phaser.Scene {
         : `Tour de : ${data.players[this.currentTurn]?.name || '...'}`
     );
 
-    let idx = 0;
     for (const [id, p] of players) {
       if (!this.players[id]) {
-        const sprite = this.add.circle(0, 0, 20, 0x5b3b24);
+        const sprite = this.add.sprite(0, 0, 'bonobo_idle');
+        sprite.setScale(1.2);
+        sprite.setDepth(4);
+        sprite.play('bonobo_idle_anim');
         this.players[id] = { sprite, data: p };
       }
 
       const tileIndex = p.tile || 0;
       const tile = this.tiles[tileIndex];
-      this.players[id].sprite.x = tile.x;
-      this.players[id].sprite.y = tile.y - 40;
-      this.players[id].data = p;
+      const playerSprite = this.players[id].sprite;
 
-      idx++;
+      playerSprite.x = tile.x;
+      playerSprite.y = tile.y - 50;
+      this.players[id].data = p;
     }
 
     if (this.currentTurn === this.playerId) {
-      this.rollButton.setAlpha(1);
-      this.rollButton.setInteractive();
+      this.setRollButtonEnabled(true);
       this.startTurnTimer();
     } else {
-      this.rollButton.setAlpha(0.5);
-      this.rollButton.disableInteractive();
+      this.setRollButtonEnabled(false);
       this.stopTurnTimer();
     }
 
@@ -139,16 +169,10 @@ class BoardScene extends Phaser.Scene {
 
       let value = Phaser.Math.Between(1, 6);
 
-      if (this.activeItem === 'bananaBoost') {
-        value += 3;
-      }
-      if (this.activeItem === 'goldenDice') {
-        value = Phaser.Math.Between(4, 6);
-      }
+      if (this.activeItem === 'bananaBoost') value += 3;
+      if (this.activeItem === 'goldenDice') value = Phaser.Math.Between(4, 6);
 
-      // On garde l’info du bouclier pour ce tour
       const usedShield = this.activeItem === 'shield';
-
       this.activeItem = null;
 
       let newTile = currentTile + value;
@@ -161,16 +185,16 @@ class BoardScene extends Phaser.Scene {
       if (this.bonusTiles.includes(newTile)) {
         addScore(this.roomRef, this.playerId, 2);
         this.sound.play('bonusSound');
-        this.showFloatingText(tile.x, tile.y - 60, '+2 points !');
+        this.showFloatingText(tile.x, tile.y - 80, '+2 points !');
       }
 
       if (this.malusTiles.includes(newTile)) {
         if (usedShield) {
-          this.showFloatingText(tile.x, tile.y - 60, 'Bouclier !');
+          this.showFloatingText(tile.x, tile.y - 80, 'Bouclier !');
         } else {
           addScore(this.roomRef, this.playerId, -1);
           this.sound.play('malusSound');
-          this.showFloatingText(tile.x, tile.y - 60, '-1 point...');
+          this.showFloatingText(tile.x, tile.y - 80, '-1 point...');
         }
       }
 
@@ -180,10 +204,9 @@ class BoardScene extends Phaser.Scene {
         const path = 'players/' + this.playerId + '/items/' + item;
         this.roomRef.child(path).transaction(v => (v || 0) + 1);
         this.sound.play('bonusSound');
-        this.showFloatingText(tile.x, tile.y - 90, 'Objet obtenu !');
+        this.showFloatingText(tile.x, tile.y - 110, 'Objet obtenu !');
       }
 
-      // Fin de tour : on arrête le timer et on passe au suivant
       this.stopTurnTimer();
 
       if (newTile === 11) {
@@ -209,44 +232,44 @@ class BoardScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    const panel = this.add.rectangle(width / 2, height / 2, 320, 260, 0x000000, 0.8);
-    panel.setStrokeStyle(2, 0xffdd55);
+    const panel = this.add.image(width / 2, height / 2, 'ui_panel').setDepth(20);
+    panel.setScale(1.2);
 
     const title = this.add.text(width / 2, height / 2 - 110, 'Objets', {
       fontSize: '24px',
       fill: '#ffdd55'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(21);
 
     let y = height / 2 - 60;
-
     const buttons = [];
 
-    const addItemButton = (label, key) => {
+    const addItemButton = (label, key, iconKey) => {
       const count = data.items[key] || 0;
       if (count <= 0) return;
 
-      const btn = this.add.text(width / 2, y, `${label} x${count}`, {
+      const icon = this.add.image(width / 2 - 80, y, iconKey).setScale(0.8).setDepth(21);
+      const btn = this.add.text(width / 2 + 20, y, `${label} x${count}`, {
         fontSize: '20px',
         fill: '#ffffff'
-      }).setOrigin(0.5).setInteractive();
+      }).setOrigin(0.5).setDepth(21).setInteractive();
 
       btn.on('pointerdown', () => {
         this.useItem(key);
         cleanup();
       });
 
-      buttons.push(btn);
-      y += 40;
+      buttons.push(btn, icon);
+      y += 50;
     };
 
-    addItemButton('🍌 Banane Turbo', 'bananaBoost');
-    addItemButton('🛡️ Bouclier', 'shield');
-    addItemButton('🎲 Dé Doré', 'goldenDice');
+    addItemButton('Banane Turbo', 'bananaBoost', 'item_banana');
+    addItemButton('Bouclier', 'shield', 'item_shield');
+    addItemButton('Dé Doré', 'goldenDice', 'item_golden_dice');
 
-    const closeBtn = this.add.text(width / 2, height / 2 + 90, '[ Fermer ]', {
+    const closeBtn = this.add.text(width / 2, height / 2 + 110, '[ Fermer ]', {
       fontSize: '18px',
       fill: '#ffdd55'
-    }).setOrigin(0.5).setInteractive();
+    }).setOrigin(0.5).setDepth(21).setInteractive();
 
     closeBtn.on('pointerdown', () => cleanup());
 
@@ -264,14 +287,16 @@ class BoardScene extends Phaser.Scene {
     this.activeItem = item;
 
     const p = this.players[this.playerId].sprite;
-    this.showFloatingText(p.x, p.y - 60, 'Objet utilisé !');
+    this.showFloatingText(p.x, p.y - 80, 'Objet utilisé !');
   }
 
   showFloatingText(x, y, text) {
     const t = this.add.text(x, y, text, {
       fontSize: '18px',
-      fill: '#ffdd55'
-    }).setOrigin(0.5);
+      fill: '#ffdd55',
+      stroke: '#000000',
+      strokeThickness: 3
+    }).setOrigin(0.5).setDepth(30);
 
     this.tweens.add({
       targets: t,
@@ -281,8 +306,6 @@ class BoardScene extends Phaser.Scene {
       onComplete: () => t.destroy()
     });
   }
-
-  // --- Timer de tour ---
 
   startTurnTimer() {
     this.stopTurnTimer();
