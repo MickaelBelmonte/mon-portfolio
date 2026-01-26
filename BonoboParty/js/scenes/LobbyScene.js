@@ -27,7 +27,14 @@ class LobbyScene extends Phaser.Scene {
 
     // 🔥 Récupération pseudo + ID persistant
     const name = this.registry.get('playerName');
-    const savedId = this.registry.get('savedId');
+    let savedId = this.registry.get('savedId');
+
+    // 🔥 Sécurisation : savedId doit toujours être valide
+    if (!savedId || typeof savedId !== "string" || savedId.length < 2) {
+      savedId = randomId();
+      localStorage.setItem("bonoboPlayerId", savedId);
+      this.registry.set("savedId", savedId);
+    }
 
     createOrJoinRoom(name, savedId, (roomRef, playerId) => {
       this.roomRef = roomRef;
@@ -83,4 +90,3 @@ class LobbyScene extends Phaser.Scene {
     }
   }
 }
-
