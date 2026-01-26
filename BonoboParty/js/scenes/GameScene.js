@@ -13,7 +13,6 @@ class GameScene extends Phaser.Scene {
     this.finishX = width - 120;
     this.gameFinished = false;
 
-    // Fond
     this.cameras.main.setBackgroundColor('#123018');
 
     // Sol
@@ -32,13 +31,12 @@ class GameScene extends Phaser.Scene {
       fill: '#ffffff'
     }).setOrigin(0.5);
 
-    // Info
-    this.infoText = this.add.text(width / 2, height - 100, 'Clique pour faire courir ton bonobo !', {
+    this.infoText = this.add.text(width / 2, height - 100, 'Clique pour courir !', {
       fontSize: '20px',
       fill: '#ffddaa'
     }).setOrigin(0.5);
 
-    // Sainte Banane (boost visuel)
+    // Sainte Banane (boost)
     this.banana = this.add.container(width / 2, 120);
     const glow = this.add.circle(0, 0, 40, 0xffffaa, 0.4);
     const bananaShape = this.add.arc(0, 0, 20, 200, 340, false)
@@ -47,19 +45,22 @@ class GameScene extends Phaser.Scene {
     this.banana.setAlpha(0);
 
     this.players = {};
-    this.rankings = [];
+    this.obstacles = [];
+
+    // Générer obstacles
+    this.spawnObstacles();
 
     // Écoute Firebase
     listenRoom(this.roomRef, (data) => {
       this.syncFromFirebase(data);
     });
 
-    // Input : cliquer pour courir
+    // Input
     this.input.on('pointerdown', () => {
       this.handleClick();
     });
 
-    // Petite animation de la banane
+    // Animation banane
     this.tweens.add({
       targets: this.banana,
       alpha: 1,
@@ -71,16 +72,25 @@ class GameScene extends Phaser.Scene {
     });
   }
 
-  // Synchronisation depuis Firebase
+  spawnObstacles() {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    for (let i = 0; i < 4; i++) {
+      const x = Phaser.Math.Between(300, width - 200);
+      const y = 180 + i * 80;
+
+      const rock = this.add.circle(x, y, 20, 0x4a3a2a);
+      this.obstacles.push(rock);
+    }
+  }
+
   syncFromFirebase(data) {
     if (!data || !data.players) return;
 
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
     const spacing = 120;
     let index = 0;
 
-    // Si la room a un état "finished", on bloque le jeu
     if (data.state === 'finished' && !this.gameFinished) {
       this.gameFinished = true;
       this.showResults(data);
@@ -88,57 +98,71 @@ class GameScene extends Phaser.Scene {
 
     for (const [id, p] of Object.entries(data.players)) {
       if (!this.players[id]) {
-        // Création visuelle du bonobo
         const y = 180 + index * spacing;
-        const container = this.add.container(100, y);
-
-        const body = this.add.rectangle(0, 10, 40, 50, 0x5b3b24).setOrigin(0.5, 1);
-        const head = this.add.circle(0, -30, 18, 0x5b3b24);
-        const face = this.add.ellipse(0, -25, 26, 20, 0xc48a5a);
-        const eyeL = this.add.circle(-6, -30, 4, 0xffffff);
-        const eyeR = this.add.circle(6, -30, 4, 0xffffff);
-        const pupilL = this.add.circle(-6, -30, 2, 0x000000);
-        const pupilR = this.add.circle(6, -30, 2, 0x000000);
-
-        container.add([body, head, face, eyeL, eyeR, pupilL, pupilR]);
-
-        const nameText = this.add.text(0, 40, id, {
-          fontSize: '14px',
-          fill: '#ffffff'
-        }).setOrigin(0.5);
-
-        container.add(nameText);
-
-        this.players[id] = {
-          container,
-          nameText,
-          data: p
-        };
+        const container = this.createBonobo(100, y, id);
+        this.players[id] = { container, data: p };
       }
 
       const player = this.players[id];
-
-      // Position X
-      const x = p.x !== undefined ? p.x : 100;
-      player.container.x = x;
-
-      // Sauvegarde des données
+      player.container.x = p.x ?? 100;
       player.data = p;
+
       index++;
     }
   }
 
-  // Quand le joueur clique
+  createBonobo(x, y, id) {
+    const container = this.add.container(x, y);
+
+    const body = this.add.rectangle(0, 10, 40, 50, 0x5b3b24).setOrigin(0.5, 1);
+    const head = this.add.circle(0, -30, 18, 0x5b3b24);
+    const face = this.add.ellipse(0, -25, 26, 20, 0xc48a5a);
+    const eyeL = this.add.circle(-6, -30, 4, 0xffffff);
+    const eyeR = this.add.circle(6, -30, 4, 0xffffff);
+    const pupilL = this.add.circle(-6, -30, 2, 0x000000);
+    const pupilR = this.add.circle(6, -30, 2, 0x000000);
+
+    const nameText = this.add.text(0, 40, id, {
+      fontSize: '14px',
+      fill: '#ffffff'
+    }).setOrigin(0.5);
+
+    container.add([body, head, face, eyeL, eyeR, pupilL, pupilR, nameText]);
+
+    return container;
+  }
+
   handleClick() {
     if (this.gameFinished) return;
+
     const player = this.players[this.playerId];
     if (!player) return;
 
-    // Petit boost aléatoire
-    const boost = Phaser.Math.Between(10, 25);
-    const newX = player.container.x + boost;
+    const currentX = player.container.x;
 
-    // Animation de "saut" du bonobo
+    // Vérifier obstacle
+    const hitObstacle = this.obstacles.some(obs => {
+      return Math.abs(obs.x - currentX) < 30;
+    });
+
+    let boost = Phaser.Math.Between(10, 25);
+
+    if (hitObstacle) {
+      boost = -10; // recule un peu
+      this.infoText.setText('Aïe ! Un obstacle !');
+    } else {
+      this.infoText.setText('Clique pour courir !');
+    }
+
+    // Boost Sainte Banane (5% de chance)
+    if (Phaser.Math.Between(1, 20) === 1) {
+      boost = 50;
+      this.showBananaFlash();
+    }
+
+    const newX = currentX + boost;
+
+    // Animation de course
     this.tweens.add({
       targets: player.container,
       y: player.container.y - 10,
@@ -146,36 +170,30 @@ class GameScene extends Phaser.Scene {
       yoyo: true
     });
 
-    // Mise à jour Firebase
     updatePlayer(this.roomRef, this.playerId, { x: newX });
 
-    // Si on dépasse la ligne d'arrivée
     if (newX >= this.finishX && !player.data.finished) {
       this.handleFinish();
     }
   }
 
-  // Quand ce joueur termine la course
+  showBananaFlash() {
+    this.cameras.main.flash(200, 255, 255, 100);
+  }
+
   async handleFinish() {
     const player = this.players[this.playerId];
     if (!player) return;
 
-    // Marquer ce joueur comme "finished"
-    await updatePlayer(this.roomRef, this.playerId, {
-      finished: true
-    });
+    await updatePlayer(this.roomRef, this.playerId, { finished: true });
 
-    // Récupérer l'état actuel pour calculer le rang
     this.roomRef.get().then((snapshot) => {
       const data = snapshot.val();
-      if (!data || !data.players) return;
-
       const finishedPlayers = Object.values(data.players).filter(p => p.finished);
       const rank = finishedPlayers.length;
 
       updatePlayer(this.roomRef, this.playerId, { rank });
 
-      // Si tout le monde a fini (3 joueurs max)
       const totalPlayers = Object.keys(data.players).length;
       if (finishedPlayers.length === totalPlayers) {
         setRoomState(this.roomRef, 'finished');
@@ -183,7 +201,6 @@ class GameScene extends Phaser.Scene {
     });
   }
 
-  // Affichage des résultats
   showResults(data) {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
