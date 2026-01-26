@@ -10,14 +10,24 @@ class BoardScene extends Phaser.Scene {
     this.roomRef = this.registry.get('roomRef');
     this.playerId = this.registry.get('playerId');
 
-    // Fond jungle
+    // --- Fond jungle animé ---
     const bg = this.add.image(width / 2, height / 2, 'bg_jungle');
     bg.setDisplaySize(width, height);
 
-    // Plateau (chemin)
-    const board = this.add.image(width / 2, height / 2, 'board_path');
-    board.setOrigin(0.5);
+    this.tweens.add({
+      targets: bg,
+      x: width / 2 + 20,
+      duration: 2000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
 
+    // --- Plateau graphique ---
+    const board = this.add.image(width / 2, height / 2 + 40, 'board_path');
+    board.setDepth(1);
+
+    // --- Cases du plateau ---
     this.tiles = [];
     this.bonusTiles = [2, 7];
     this.malusTiles = [4, 10];
@@ -25,9 +35,8 @@ class BoardScene extends Phaser.Scene {
 
     const tileSize = 80;
     const startX = 120;
-    const y = height / 2 + 40; // léger décalage
+    const y = height / 2 + 40;
 
-    // Cases avec sprites
     for (let i = 0; i < 12; i++) {
       const x = startX + i * tileSize;
 
@@ -36,43 +45,56 @@ class BoardScene extends Phaser.Scene {
       if (this.malusTiles.includes(i)) key = 'tile_malus';
       if (this.itemTiles.includes(i)) key = 'tile_item';
 
-      const tile = this.add.image(x, y, key).setScale(0.9);
-      tile.setDepth(1);
+      const tile = this.add.image(x, y, key).setScale(0.9).setDepth(2);
       this.tiles.push(tile);
     }
 
+    // --- Titre ---
     this.add.text(width / 2, 80, 'Plateau Bonobo', {
       fontSize: '32px',
-      fill: '#ffffff'
-    }).setOrigin(0.5).setDepth(5);
+      fill: '#ffffff',
+      stroke: '#000',
+      strokeThickness: 4
+    }).setOrigin(0.5).setDepth(10);
 
+    // --- Texte du tour ---
     this.turnText = this.add.text(width / 2, 130, '', {
-      fontSize: '20px',
-      fill: '#ffdd88'
-    }).setOrigin(0.5).setDepth(5);
+      fontSize: '22px',
+      fill: '#ffdd88',
+      stroke: '#000',
+      strokeThickness: 3
+    }).setOrigin(0.5).setDepth(10);
 
-    // Timer si tu veux le garder
+    // --- Timer ---
     this.turnTime = 20;
     this.turnTimer = null;
     this.remainingTime = 0;
+
     this.timerText = this.add.text(width - 120, 40, '', {
       fontSize: '26px',
-      fill: '#ffdd55'
-    }).setOrigin(0.5).setDepth(5);
+      fill: '#ffdd55',
+      stroke: '#000',
+      strokeThickness: 3
+    }).setOrigin(0.5).setDepth(10);
 
+    // --- Musique ---
     this.music = this.sound.add('boardMusic', { loop: true, volume: 0.4 });
     this.music.play();
 
+    // --- Joueurs ---
     this.players = {};
     this.currentTurn = null;
     this.activeItem = null;
 
-    // Bouton lancer dé (UI image + texte)
-    const rollBtnImg = this.add.image(width / 2, height - 80, 'ui_button').setScale(1.2).setDepth(5);
+    // --- Bouton lancer dé ---
+    const rollBtnImg = this.add.image(width / 2, height - 80, 'ui_button')
+      .setScale(1.2)
+      .setDepth(10);
+
     this.rollButton = this.add.text(rollBtnImg.x, rollBtnImg.y, 'Lancer le dé', {
       fontSize: '22px',
-      fill: '#000000'
-    }).setOrigin(0.5).setDepth(6);
+      fill: '#000'
+    }).setOrigin(0.5).setDepth(11);
 
     rollBtnImg.setInteractive();
     rollBtnImg.on('pointerdown', () => this.rollDice());
@@ -80,21 +102,26 @@ class BoardScene extends Phaser.Scene {
     this.rollBtnImg = rollBtnImg;
     this.setRollButtonEnabled(false);
 
-    // Bouton objets
-    const itemBtnImg = this.add.image(140, height - 80, 'ui_button').setScale(0.9).setDepth(5);
+    // --- Bouton objets ---
+    const itemBtnImg = this.add.image(140, height - 80, 'ui_button')
+      .setScale(0.9)
+      .setDepth(10);
+
     this.itemButton = this.add.text(itemBtnImg.x, itemBtnImg.y, 'Objets', {
       fontSize: '20px',
-      fill: '#000000'
-    }).setOrigin(0.5).setDepth(6);
+      fill: '#000'
+    }).setOrigin(0.5).setDepth(11);
 
     itemBtnImg.setInteractive();
     itemBtnImg.on('pointerdown', () => this.openItemMenu());
 
     this.itemBtnImg = itemBtnImg;
 
+    // --- Sync Firebase ---
     listenRoom(this.roomRef, data => this.syncFromFirebase(data));
   }
 
+  // --- Activation / désactivation du bouton ---
   setRollButtonEnabled(enabled) {
     if (enabled) {
       this.rollBtnImg.setAlpha(1);
@@ -107,6 +134,7 @@ class BoardScene extends Phaser.Scene {
     }
   }
 
+  // --- Synchronisation Firebase ---
   syncFromFirebase(data) {
     if (!data || !data.players) return;
 
@@ -122,24 +150,42 @@ class BoardScene extends Phaser.Scene {
         : `Tour de : ${data.players[this.currentTurn]?.name || '...'}`
     );
 
+    // --- Placement des joueurs ---
+    let idx = 0;
     for (const [id, p] of players) {
       if (!this.players[id]) {
-        const sprite = this.add.sprite(0, 0, 'bonobo_idle');
-        sprite.setScale(1.2);
-        sprite.setDepth(4);
+        const sprite = this.add.sprite(0, 0, 'bonobo_idle')
+          .setScale(1.3)
+          .setDepth(5);
+
         sprite.play('bonobo_idle_anim');
-        this.players[id] = { sprite, data: p };
+
+        const nameText = this.add.text(0, 0, p.name, {
+          fontSize: '16px',
+          fill: '#ffffff',
+          stroke: '#000',
+          strokeThickness: 3
+        }).setOrigin(0.5).setDepth(6);
+
+        this.players[id] = { sprite, nameText, data: p };
       }
 
       const tileIndex = p.tile || 0;
       const tile = this.tiles[tileIndex];
-      const playerSprite = this.players[id].sprite;
 
-      playerSprite.x = tile.x;
-      playerSprite.y = tile.y - 50;
-      this.players[id].data = p;
+      const player = this.players[id];
+      player.sprite.x = tile.x;
+      player.sprite.y = tile.y - 50;
+
+      player.nameText.x = tile.x;
+      player.nameText.y = tile.y - 90;
+
+      player.data = p;
+
+      idx++;
     }
 
+    // --- Gestion du tour ---
     if (this.currentTurn === this.playerId) {
       this.setRollButtonEnabled(true);
       this.startTurnTimer();
@@ -148,6 +194,7 @@ class BoardScene extends Phaser.Scene {
       this.stopTurnTimer();
     }
 
+    // --- Passage au mini-jeu ---
     if (data.state === 'minigame') {
       this.music.stop();
       this.stopTurnTimer();
@@ -155,6 +202,7 @@ class BoardScene extends Phaser.Scene {
     }
   }
 
+  // --- Lancer le dé ---
   rollDice() {
     if (this.currentTurn !== this.playerId) return;
 
@@ -182,12 +230,14 @@ class BoardScene extends Phaser.Scene {
 
       const tile = this.tiles[newTile];
 
+      // Bonus
       if (this.bonusTiles.includes(newTile)) {
         addScore(this.roomRef, this.playerId, 2);
         this.sound.play('bonusSound');
         this.showFloatingText(tile.x, tile.y - 80, '+2 points !');
       }
 
+      // Malus
       if (this.malusTiles.includes(newTile)) {
         if (usedShield) {
           this.showFloatingText(tile.x, tile.y - 80, 'Bouclier !');
@@ -198,6 +248,7 @@ class BoardScene extends Phaser.Scene {
         }
       }
 
+      // Objet
       if (this.itemTiles.includes(newTile)) {
         const items = ['bananaBoost', 'shield', 'goldenDice'];
         const item = Phaser.Math.RND.pick(items);
@@ -209,6 +260,7 @@ class BoardScene extends Phaser.Scene {
 
       this.stopTurnTimer();
 
+      // Mini-jeu
       if (newTile === 11) {
         setRoomState(this.roomRef, 'minigame');
       } else {
@@ -222,6 +274,7 @@ class BoardScene extends Phaser.Scene {
     });
   }
 
+  // --- Menu objets ---
   openItemMenu() {
     const player = this.players[this.playerId];
     if (!player) return;
@@ -232,12 +285,15 @@ class BoardScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    const panel = this.add.image(width / 2, height / 2, 'ui_panel').setDepth(20);
-    panel.setScale(1.2);
+    const panel = this.add.image(width / 2, height / 2, 'ui_panel')
+      .setScale(1.3)
+      .setDepth(20);
 
     const title = this.add.text(width / 2, height / 2 - 110, 'Objets', {
       fontSize: '24px',
-      fill: '#ffdd55'
+      fill: '#ffdd55',
+      stroke: '#000',
+      strokeThickness: 3
     }).setOrigin(0.5).setDepth(21);
 
     let y = height / 2 - 60;
@@ -247,10 +303,15 @@ class BoardScene extends Phaser.Scene {
       const count = data.items[key] || 0;
       if (count <= 0) return;
 
-      const icon = this.add.image(width / 2 - 80, y, iconKey).setScale(0.8).setDepth(21);
+      const icon = this.add.image(width / 2 - 80, y, iconKey)
+        .setScale(0.8)
+        .setDepth(21);
+
       const btn = this.add.text(width / 2 + 20, y, `${label} x${count}`, {
         fontSize: '20px',
-        fill: '#ffffff'
+        fill: '#ffffff',
+        stroke: '#000',
+        strokeThickness: 3
       }).setOrigin(0.5).setDepth(21).setInteractive();
 
       btn.on('pointerdown', () => {
@@ -268,7 +329,9 @@ class BoardScene extends Phaser.Scene {
 
     const closeBtn = this.add.text(width / 2, height / 2 + 110, '[ Fermer ]', {
       fontSize: '18px',
-      fill: '#ffdd55'
+      fill: '#ffdd55',
+      stroke: '#000',
+      strokeThickness: 3
     }).setOrigin(0.5).setDepth(21).setInteractive();
 
     closeBtn.on('pointerdown', () => cleanup());
@@ -281,6 +344,7 @@ class BoardScene extends Phaser.Scene {
     };
   }
 
+  // --- Utilisation d'un objet ---
   useItem(item) {
     const path = 'players/' + this.playerId + '/items/' + item;
     this.roomRef.child(path).transaction(v => Math.max(0, (v || 0) - 1));
@@ -290,11 +354,12 @@ class BoardScene extends Phaser.Scene {
     this.showFloatingText(p.x, p.y - 80, 'Objet utilisé !');
   }
 
+  // --- Texte flottant ---
   showFloatingText(x, y, text) {
     const t = this.add.text(x, y, text, {
       fontSize: '18px',
       fill: '#ffdd55',
-      stroke: '#000000',
+      stroke: '#000',
       strokeThickness: 3
     }).setOrigin(0.5).setDepth(30);
 
@@ -307,6 +372,7 @@ class BoardScene extends Phaser.Scene {
     });
   }
 
+  // --- Timer ---
   startTurnTimer() {
     this.stopTurnTimer();
 
@@ -345,3 +411,4 @@ class BoardScene extends Phaser.Scene {
     });
   }
 }
+
